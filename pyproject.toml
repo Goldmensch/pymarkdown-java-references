@@ -1,0 +1,23 @@
+[project]
+name = "javadoc-references"
+version = "0.1"
+
+dependencies = [
+    "requests",
+    "markdown",
+]
+
+authors = [
+    {name = "Nick Hensel"}
+]
+readme = "README.md"
+requires-python = ">=3.9"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest"
+]
