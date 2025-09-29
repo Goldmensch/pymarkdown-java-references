@@ -1,13 +1,13 @@
 ## review note: just let this file here for future testing
 import markdown
-from javadoc_references import JavaDocExtension
+from markdown_javadoc_references import JavaDocRefExtension
 
 def compare(expected, input):
     urls = [
         'https://docs.oracle.com/en/java/javase/24/docs/api/'
     ]
 
-    result = markdown.markdown(input, extensions=[JavaDocExtension(urls=urls)])
+    result = markdown.markdown(input, extensions=[JavaDocRefExtension(urls=urls)])
 
 
     assert "<a " in result, f"No link parsed from: {input!r}"

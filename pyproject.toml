@@ -1,5 +1,5 @@
 [project]
-name = "javadoc-references"
+name = "markdown_javadoc_references"
 version = "0.1"
 
 dependencies = [
