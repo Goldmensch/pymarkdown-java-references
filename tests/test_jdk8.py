@@ -1,0 +1,51 @@
+## review note: just let this file here for future testing
+import markdown
+from markdown_javadoc_references import JavaDocRefExtension
+
+default_urls = [
+    'https://docs.oracle.com/javase/8/docs/api/'
+]
+
+def compare(expected, text, urls=default_urls):
+    result = markdown.markdown(text, extensions=[JavaDocRefExtension(urls=urls)])
+    assert "<a " in result, f"No link parsed from: {text!r}"
+
+    assert expected == result
+
+def test_only_class():
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></p>'
+    compare(expected, "[String](String)")
+
+def test_class_with_package():
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></p>'
+    compare(expected, "[String](java.lang.String)")
+
+def test_class_with_function_without_parameter():
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html#trim--">String</a></p>'
+    compare(expected, "[String](String#trim())")
+
+def test_class_with_function_without_parameter_not_existing():
+    expected = '<p><a href="String#notexisting()">Invalid reference to String#notexisting()</a></p>'
+    compare(expected, "[String](String#notexisting())")
+
+def test_class_with_vararg_parameter():
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html#join-java.lang.CharSequence-java.lang.CharSequence...-">String</a></p>'
+    compare(expected, "[String](String#join(CharSequence, CharSequence...))")
+
+def test_class_with_array():
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html#copyValueOf-char:A-int-int-">String</a></p>'
+    compare(expected, "[String](String#copyValueOf(char[], int, int))")
+
+def test_class_with_function_with_parameter_primitive():
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html#substring-int-">String</a></p>'
+    compare(expected, "[String](String#substring(int))")
+
+def test_class_with_function_with_parameter_object():
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html#lastIndexOf-java.lang.String-">String</a></p>'
+    compare(expected, "[String](String#lastIndexOf(String))")
+
+def test_class_with_function_with_parameter_object_and_primitive():
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html#lastIndexOf-java.lang.String-int-">String</a></p>'
+    compare(expected, "[String](String#lastIndexOf(String, int))")
+
+
