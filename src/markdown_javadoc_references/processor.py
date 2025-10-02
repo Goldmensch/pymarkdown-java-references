@@ -14,11 +14,9 @@ def process_url(url):
     return docsite.load(stripped_url)
 
 
-def match(site_classes, reference):
-    if reference.class_name not in site_classes: return None
-
+def match(klasses, reference):
     # search in each class
-    for klass in site_classes[reference.class_name]:
+    for klass in klasses:
         # compare package if given
         if reference.package is not None and (klass.package != reference.package): continue
         # compare method if given
@@ -77,6 +75,7 @@ class JavaDocProcessor(Treeprocessor):
     def find_matching_javadoc(self, reference):
         matches = list()
         for site in self.sites:
-            link = match(site, reference)
+            klasses = site.klasses_for_ref(reference)
+            link = match(klasses, reference)
             if link is not None: matches.append(link)
         return matches

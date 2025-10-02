@@ -20,6 +20,14 @@ def test_without_module():
     expected = '<p><a href="https://docs.jda.wiki/net/dv8tion/jda/api/JDA.html">JDA</a></p>'
     compare(expected, '[JDA](JDA)', urls)
 
+def test_constructor_with_parameters():
+    expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html#%3Cinit%3E(byte[],int,int,java.nio.charset.Charset)">String</a></p>'
+    compare(expected, "[String](String#<init>(byte[],int,int,java.nio.charset.Charset))")
+
+def test_constructor_without_parameters():
+    expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html#%3Cinit%3E()">String</a></p>'
+    compare(expected, "[String](String#<init>())")
+
 def test_only_class():
     expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html">String</a></p>'
     compare(expected, "[String](String)")

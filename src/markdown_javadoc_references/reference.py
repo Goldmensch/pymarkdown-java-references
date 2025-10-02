@@ -1,6 +1,6 @@
 import re
 
-pattern = re.compile(r'([\w.]*\.)?(\w+)(?:#(\w+)\((.*)\))?$')
+pattern = re.compile(r'([\w.]*\.)?(\w+)(?:#(<?\w+>?)\((.*)\))?$')
 
 
 def create_or_none(raw):

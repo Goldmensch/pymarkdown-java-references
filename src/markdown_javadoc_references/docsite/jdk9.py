@@ -1,5 +1,6 @@
 import json
 import logging
+import urllib.parse
 
 from .util import read_url
 from ..entities import *
@@ -13,7 +14,8 @@ def load(url):
     packages = load_packages(url)
     members = load_members(url)
 
-    return load_classes(url, packages, members)
+    klasses =  load_classes(url, packages, members)
+    return Jdk9(klasses)
 
 
 def read_url_json(url, prefix):
@@ -60,11 +62,11 @@ def load_classes(url, pkgs, members):
 
             # get through all members of class
             for m in members[i]:
-                m_name = m['l'].split('(', 1)[0]  ## get name -> split at ( and get first half
+                index = 'u' if 'u' in m else 'l'
+                m_name = urllib.parse.unquote(m[index].split('(', 1)[0])  ## get name -> split at ( and get first half
                 parameters = list()
 
                 # u in only included if reference types are parameters. No parameters + only primitives -> l
-                index = 'u' if 'u' in m else 'l'
                 raw = m[index]
                 if '(' in raw:  # just exclude fields for now
                     u_split = raw.split('(', 1)[1].removesuffix(')')
@@ -93,6 +95,7 @@ def build_url(base, module, package, klass_name, m):
     # optional: append method name
     if m is not None:
         base = f'{base}#{(m['u'] if 'u' in m else m['l'])}'
+
     return base
 
 
@@ -103,3 +106,10 @@ def load_packages(url):
     for e in data:
         index[e['l']] = e
     return index
+
+class Jdk9:
+    def __init__(self, klasses):
+        self.klasses = klasses
+
+    def klasses_for_ref(self, reference):
+        return self.klasses[reference.class_name] if reference.class_name in self.klasses else None

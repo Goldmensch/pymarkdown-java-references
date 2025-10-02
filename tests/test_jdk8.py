@@ -16,6 +16,14 @@ def test_only_class():
     expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></p>'
     compare(expected, "[String](String)")
 
+def test_constructor_with_parameters():
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html#String-byte:A-int-int-java.nio.charset.Charset-">String</a></p>'
+    compare(expected, "[String](String#<init>(byte[],int,int,java.nio.charset.Charset))")
+
+def test_constructor_without_parameters():
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html#String--">String</a></p>'
+    compare(expected, "[String](String#<init>())")
+
 def test_class_with_package():
     expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></p>'
     compare(expected, "[String](java.lang.String)")

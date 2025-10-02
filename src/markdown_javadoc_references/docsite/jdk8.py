@@ -1,4 +1,5 @@
 import logging
+import urllib.parse
 from concurrent.futures import ThreadPoolExecutor
 
 from bs4 import BeautifulSoup
@@ -15,27 +16,21 @@ def load(url):
 
     soup = BeautifulSoup(read_url(f'{url}/allclasses-noframe.html'), 'html.parser')
 
-    class_list = soup.find('body').find('div').find('ul').select('a[href]')
-
-    with ThreadPoolExecutor() as pool:
-        results = list(pool.map(lambda c: load_class(url, c), class_list))
-
     klasses = dict()
-    for klass in results:
+
+    for anchor in soup.find('body').find('div').find('ul').select('a[href]'):
+        klass = load_class(url, anchor)
         klasses.setdefault(klass.name, []).append(klass)
 
-    return klasses
+    return Jdk8(klasses)
 
 
 def load_class(url, c):
     name = c.get_text(strip=True)
     package = c.get('title').split()[-1]
-    methods = list()
 
-    klass = Klass(None, package, name, methods, f'{url}/{c.get('href')}')
+    klass = Klass(None, package, name, None, f'{url}/{c.get('href')}')
     logger.info(f'Loading {package}.{name} from {klass.url}')
-
-    load_members(klass.url, methods, klass)
 
     return klass
 
@@ -51,6 +46,7 @@ def load_members(url, methods, klass):
 
         # first part is always name
         method = parts[0]
+        if method == klass.name: method = '<init>' # normalise constructor method names to <init>
         new_params = []
 
         # following parts are parameters
@@ -69,4 +65,23 @@ def load_members(url, methods, klass):
 
             new_params.append(new_name.strip())
 
-        methods.append(Method(klass, method, new_params, f'{url}#{a}'))
+        unquoted_url = urllib.parse.unquote(f'{url}#{a}')
+        methods.append(Method(klass, method, new_params, unquoted_url))
+
+class Jdk8:
+    def __init__(self, klasses):
+        self.klasses = klasses
+
+    # lazy load
+    def klasses_for_ref(self, reference):
+        found = self.klasses[reference.class_name]
+
+        loaded = list()
+        for klass in found:
+            if klass.methods is None:
+                methods = list()
+                load_members(klass.url, methods, klass)
+                klass.methods = methods
+            loaded.append(klass)
+
+        return loaded
