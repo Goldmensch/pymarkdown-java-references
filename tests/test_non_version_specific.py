@@ -22,3 +22,7 @@ def test_autolink_only_class():
 def test_autolink_with_parameters():
     expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html#join(java.lang.CharSequence,java.lang.CharSequence...)">String#join(CharSequence, CharSequence...)</a></p>'
     compare(expected, "<String#join(CharSequence, CharSequence...)>")
+
+def test_autolink_in_codeblock():
+    expected = '<p><code>&lt;String#join(CharSequence, CharSequence...)&gt;</code></p>'
+    compare(expected, "`<String#join(CharSequence, CharSequence...)>`")
