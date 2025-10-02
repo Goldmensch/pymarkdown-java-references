@@ -1,10 +1,14 @@
 import logging
 from concurrent.futures import ThreadPoolExecutor
+import xml.etree.ElementTree as etree
 
 from markdown.treeprocessors import Treeprocessor
+from markdown.inlinepatterns import InlineProcessor
 
 from .docsite import docsite
 from .reference import create_or_none
+
+from .reference import raw_pattern as ref_pattern
 
 logger = logging.getLogger(__name__)
 
@@ -79,3 +83,16 @@ class JavaDocProcessor(Treeprocessor):
             link = match(klasses, reference)
             if link is not None: matches.append(link)
         return matches
+
+
+auto_link_pattern = rf'<({ref_pattern[:-1]})>$'
+class AutoLinkJavaDocProcessor(InlineProcessor):
+    def __init__(self, md):
+        super().__init__(auto_link_pattern, md)
+
+    def handleMatch(self, m, data):
+        text = m.group(1)
+        el = etree.Element('a')
+        el.set('href', text)
+        el.text = text
+        return el, m.start(0), m.end(0)

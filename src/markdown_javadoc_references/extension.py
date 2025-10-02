@@ -1,6 +1,6 @@
 from markdown.extensions import Extension
 
-from .processor import JavaDocProcessor
+from .processor import JavaDocProcessor, AutoLinkJavaDocProcessor
 
 
 class JavaDocRefExtension(Extension):
@@ -13,6 +13,8 @@ class JavaDocRefExtension(Extension):
 
     def extendMarkdown(self, md):
         md.treeprocessors.register(JavaDocProcessor(md, self.getConfig("urls")), 'javadoc_reference_processor', 15)
+
+        md.inlinePatterns.register(AutoLinkJavaDocProcessor(md), 'javadoc_reference_autolink_processor', 140)
 
 
 def makeExtension(**kwargs):

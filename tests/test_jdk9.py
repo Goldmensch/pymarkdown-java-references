@@ -8,7 +8,6 @@ default_urls = [
 
 def compare(expected, text, urls=default_urls):
     result = markdown.markdown(text, extensions=[JavaDocRefExtension(urls=urls)])
-    assert "<a " in result, f"No link parsed from: {text!r}"
 
     assert expected == result
 
