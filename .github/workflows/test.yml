@@ -19,4 +19,3 @@ jobs:
       - name: Run tests
         run: |
           poetry run -n auto --dist=loadfile -o log_cli=true
-
