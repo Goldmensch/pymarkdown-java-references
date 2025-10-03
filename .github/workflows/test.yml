@@ -7,6 +7,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: nix develop --command bash {0}
     steps:
       - uses: actions/checkout@v3
       - uses: cachix/install-nix-action@v31
