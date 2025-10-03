@@ -9,4 +9,4 @@ def read_url(url):
 
 def check_url(url):
     resp = requests.head(url)
-    return resp.ok
+    return resp

@@ -47,3 +47,12 @@ def test_javadoc_alias_custom_alias():
 
     expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></p>'
     compare(expected, "<jdk8 -> String>", urls)
+
+
+def test_site_not_found():
+    urls = [
+        'https://notworkingdocs.com',
+    ]
+
+    expected = '<p><a href="jdk8 -&gt; String">Invalid reference to jdk8 -&gt; String</a></p>'
+    compare(expected, "<jdk8 -> String>", urls)

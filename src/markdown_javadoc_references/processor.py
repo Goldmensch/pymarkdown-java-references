@@ -64,9 +64,11 @@ class JavaDocProcessor(Treeprocessor):
         for entry in urls:
             if isinstance(entry, str):
                 site = process_url(entry)
+                if site is None: continue
                 self.sites[entry.strip()] = site
             elif isinstance(entry, dict) and 'alias' in entry and 'url' in entry:
                 site = process_url(entry['url'])
+                if site is None: continue
                 self.sites[entry['alias'].strip()] = site
             else:
                 raise TypeError(
