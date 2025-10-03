@@ -1,6 +1,5 @@
-name: test.yml
+name: Tests
 on: push
-
 
 jobs:
   test:
