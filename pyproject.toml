@@ -1,6 +1,7 @@
 [project]
 name = "markdown_javadoc_references"
-version = "0.1"
+description = "A Markdown extension that makes it easy to reference Javadocs"
+version = "0.1.2"
 
 dependencies = [
     "requests",
@@ -11,8 +12,40 @@ dependencies = [
 authors = [
     {name = "Nick Hensel"}
 ]
+
+license = "MIT"
+license-files = ["LICENSE"]
+
 readme = "README.md"
 requires-python = ">=3.9"
+
+keywords = ["markdown", "markdown-extension", "mkdocs", "mkdocs-plugin", "documentation", "javadoc", "java",
+    "references", "links", "markdown links", "javadoc links", "java-references", "api-docs", "docs", "doc-links"
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Web Environment",
+    "Framework :: MkDocs",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Documentation",
+    "Topic :: Documentation :: Sphinx",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Text Processing :: Markup",
+    "Typing :: Typed"
+]
+
+[project.urls]
+github = "https://github.com/Goldmensch/pymarkdown-java-references"
 
 [build-system]
 requires = ["poetry-core"]
