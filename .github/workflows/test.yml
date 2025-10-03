@@ -21,4 +21,4 @@ jobs:
           poetry install
       - name: Run tests
         run: |
-          poetry run -n auto --dist=loadfile -o log_cli=true
+          poetry run pytest -n auto --dist=loadfile -o log_cli=true
