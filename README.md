@@ -33,9 +33,10 @@ To use this extension with [MkDocs](https://www.mkdocs.org/) just add it to your
 ```yaml
 markdown_extensions:
   - markdown_javadoc_references:
-      - 'https://docs.oracle.com/en/java/javase/24/docs/api/'
-      - alias: 'jdk8'
-        url: 'https://docs.oracle.com/javase/8/docs/api/'
+      - urls:
+          - 'https://docs.oracle.com/en/java/javase/24/docs/api/'
+          - alias: 'jdk8'
+            url: 'https://docs.oracle.com/javase/8/docs/api/'
 ```
 
 ## Usage
@@ -73,9 +74,10 @@ Assuming you have a javadoc site configured with the alias "jdk8":
 ```yaml
 markdown_extensions:
   - markdown_javadoc_references:
-      - 'https://docs.oracle.com/en/java/javase/24/docs/api/'
-      - alias: 'jdk8'
-        url: 'https://docs.oracle.com/javase/8/docs/api/'
+      - urls:
+        - 'https://docs.oracle.com/en/java/javase/24/docs/api/'
+        - alias: 'jdk8'
+          url: 'https://docs.oracle.com/javase/8/docs/api/'
 ```
 
 you can now use this alias to force the extension to only search under the site `https://docs.oracle.com/javase/8/docs/api/`
