@@ -12,7 +12,7 @@ jobs:
       - uses: cachix/install-nix-action@v31
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: nix develop
+      - run: nix develop
       - name: Install poetry dependencies
         run: |
           poetry install
