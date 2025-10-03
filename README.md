@@ -60,7 +60,9 @@ Furthermore, you can also a package to method parameters:
 > If multiple matches are found for a reference, the reference will be marked as "Invalid"!
 
 ### Fields
-Like methods, fields can be referred to in a similar style: `<String#CASE_INSENSITIVE_ORDER>` will link to [String#CASE_INSENSITIVE_ORDER](https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html#CASE_INSENSITIVE_ORDER)
+Like methods, fields can be referred to in a similar style with the small detail of double `#`: `<String##CASE_INSENSITIVE_ORDER>` will link to [String#CASE_INSENSITIVE_ORDER](https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html#CASE_INSENSITIVE_ORDER)
+
+The double `#` is necessary to avoid conflicts with markdowns native headline linking.
 
 ### Constructors
 To refer to constructors, just add `<init>` in the place where the method name would be:

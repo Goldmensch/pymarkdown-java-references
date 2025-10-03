@@ -80,6 +80,7 @@ class Jdk8:
 
     # lazy load
     def klasses_for_ref(self, reference):
+        if reference.class_name not in self.klasses: return None
         found = self.klasses[reference.class_name]
 
         loaded = list()

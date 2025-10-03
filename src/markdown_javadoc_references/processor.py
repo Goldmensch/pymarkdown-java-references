@@ -100,6 +100,7 @@ class JavaDocProcessor(Treeprocessor):
                 if alias != reference.javadoc_alias: continue
 
             klasses = site.klasses_for_ref(reference)
+            if klasses is None: continue
             link = match(klasses, reference)
             if link is not None: matches.append(link)
         return matches
@@ -114,5 +115,6 @@ class AutoLinkJavaDocProcessor(InlineProcessor):
         text = m.group(1)
         el = etree.Element('a')
         el.set('href', text)
-        el.text = m.group('whole_ref')
+        # replace ## with # - ## is used for field referring
+        el.text = m.group('whole_ref').replace('##', '#')
         return el, m.start(0), m.end(0)

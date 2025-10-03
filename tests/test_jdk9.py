@@ -22,7 +22,7 @@ def test_without_module():
 
 def test_field_reference():
     expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html#CASE_INSENSITIVE_ORDER">String#CASE_INSENSITIVE_ORDER</a></p>'
-    compare(expected, "<String#CASE_INSENSITIVE_ORDER>")
+    compare(expected, "<String##CASE_INSENSITIVE_ORDER>")
 
 def test_constructor_with_parameters():
     expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html#%3Cinit%3E(byte[],int,int,java.nio.charset.Charset)">String</a></p>'
@@ -35,6 +35,10 @@ def test_constructor_without_parameters():
 def test_only_class():
     expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html">String</a></p>'
     compare(expected, "[String](String)")
+
+def test_only_class_not_existing():
+    expected = '<p><a href="NotExistingClass">Invalid reference to NotExistingClass</a></p>'
+    compare(expected, "[String](NotExistingClass)")
 
 def test_class_with_package():
     expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html">String</a></p>'
