@@ -16,6 +16,10 @@ def test_only_class():
     expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></p>'
     compare(expected, "[String](String)")
 
+def test_field_reference():
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html#CASE_INSENSITIVE_ORDER">String#CASE_INSENSITIVE_ORDER</a></p>'
+    compare(expected, "<String#CASE_INSENSITIVE_ORDER>")
+
 def test_constructor_with_parameters():
     expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html#String-byte:A-int-int-java.nio.charset.Charset-">String</a></p>'
     compare(expected, "[String](String#<init>(byte[],int,int,java.nio.charset.Charset))")

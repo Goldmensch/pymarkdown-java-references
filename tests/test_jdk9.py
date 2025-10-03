@@ -19,6 +19,11 @@ def test_without_module():
     expected = '<p><a href="https://docs.jda.wiki/net/dv8tion/jda/api/JDA.html">JDA</a></p>'
     compare(expected, '[JDA](JDA)', urls)
 
+
+def test_field_reference():
+    expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html#CASE_INSENSITIVE_ORDER">String#CASE_INSENSITIVE_ORDER</a></p>'
+    compare(expected, "<String#CASE_INSENSITIVE_ORDER>")
+
 def test_constructor_with_parameters():
     expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html#%3Cinit%3E(byte[],int,int,java.nio.charset.Charset)">String</a></p>'
     compare(expected, "[String](String#<init>(byte[],int,int,java.nio.charset.Charset))")

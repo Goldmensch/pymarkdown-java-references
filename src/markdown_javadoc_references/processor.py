@@ -7,6 +7,7 @@ from markdown.inlinepatterns import InlineProcessor
 
 from .docsite import docsite
 from .reference import create_or_none
+from .reference import Type
 
 from .reference import raw_pattern as ref_pattern
 
@@ -24,23 +25,32 @@ def match(klasses, reference):
         # compare package if given
         if reference.package is not None and (klass.package != reference.package): continue
         # compare method if given
-        if reference.method_name is not None:
-            # get all methods for class
-            methods = klass.methods
-            # search in each member
-            for method in methods:
-                # compare method name
-                if reference.method_name != method.name: continue
-                # compare parameter size
-                if len(reference.parameters) != len(method.parameters): continue
+        if reference.member_name is not None:
+            if reference.type == Type.METHOD:
+                # get all methods for class
+                methods = klass.methods
+                # search in each member
+                for method in methods:
+                    # compare method name
+                    if reference.member_name != method.name: continue
+                    # compare parameter size
+                    if len(reference.parameters) != len(method.parameters): continue
 
-                # compare parameters
-                parameter_match = True
-                for r_p, m_p in zip(reference.parameters, method.parameters):
-                    if not m_p.endswith(r_p): parameter_match = False
-                if not parameter_match: continue
+                    # compare parameters
+                    parameter_match = True
+                    for r_p, m_p in zip(reference.parameters, method.parameters):
+                        if not m_p.endswith(r_p): parameter_match = False
+                    if not parameter_match: continue
 
-                return method.url
+                    return method.url
+            else:
+                # get all fields
+                fields = klass.fields
+
+                # compare each field
+                for field in fields:
+                    if reference.member_name != field.name: continue
+                    return field.url
 
         else:  # if not given, just reference found class
             return klass.url

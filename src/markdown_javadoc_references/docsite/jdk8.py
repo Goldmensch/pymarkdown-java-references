@@ -29,24 +29,30 @@ def load_class(url, c):
     name = c.get_text(strip=True)
     package = c.get('title').split()[-1]
 
-    klass = Klass(None, package, name, None, f'{url}/{c.get('href')}')
+    klass = Klass(None, package, name, None, None, f'{url}/{c.get('href')}')
     logger.info(f'Loading {package}.{name} from {klass.url}')
 
     return klass
 
 
-def load_members(url, methods, klass):
+def load_members(url, klass):
     text = read_url(url)
+    klass.methods = list()
+    klass.fields = list()
 
     soup = BeautifulSoup(text, "html.parser")
     anchors = {a.get("name") for a in soup.find_all("a", attrs={"name": True})}
     for a in anchors:
         parts = a.split('-')
-        if len(parts) <= 1: continue
-
+        unquoted_url = urllib.parse.unquote(f'{url}#{a}')
         # first part is always name
-        method = parts[0]
-        if method == klass.name: method = '<init>' # normalise constructor method names to <init>
+        member_name = parts[0]
+
+        # is field
+        if len(parts) <= 1:
+            klass.fields.append(Field(member_name, unquoted_url))
+
+        if member_name == klass.name: member_name = '<init>' # normalize constructor method names to <init>
         new_params = []
 
         # following parts are parameters
@@ -65,8 +71,8 @@ def load_members(url, methods, klass):
 
             new_params.append(new_name.strip())
 
-        unquoted_url = urllib.parse.unquote(f'{url}#{a}')
-        methods.append(Method(klass, method, new_params, unquoted_url))
+
+        klass.methods.append(Method(klass, member_name, new_params, unquoted_url))
 
 class Jdk8:
     def __init__(self, klasses):
@@ -78,10 +84,9 @@ class Jdk8:
 
         loaded = list()
         for klass in found:
+            # none if unloaded
             if klass.methods is None:
-                methods = list()
-                load_members(klass.url, methods, klass)
-                klass.methods = methods
+                load_members(klass.url, klass)
             loaded.append(klass)
 
         return loaded

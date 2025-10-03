@@ -1,6 +1,8 @@
+from enum import Enum
+
 import re
 
-raw_pattern = r'([\w.]*\.)?(\w+)(?:#(<?\w+>?)\((.*)\))?$'
+raw_pattern = r'([\w.]*\.)?(\w+)(?:#(?:(<?\w+>?)\((.*)\))|(?:#(\w+)))?$'
 pattern = re.compile(raw_pattern)
 
 def create_or_none(raw):
@@ -16,16 +18,29 @@ class Reference:
         group 2: class name
         group 3: method name (optional, together with parameters)
         group 4: parameters (optional, together with method name)
+
+        if field reference
+        group 5: field name
         """
         self.package = match.group(1)
         if self.package is not None: self.package = self.package.removesuffix('.')
 
         self.class_name = match.group(2)
-        self.method_name = match.group(3)
 
-        self.parameters = list()
+        if match.group(5) is None:
+            self.member_name = match.group(3)
 
-        parameter = match.group(4)
-        if parameter is not None and parameter != '':
-            for par in parameter.split(','):
-                self.parameters.append(par.strip())
+            self.parameters = list()
+
+            parameter = match.group(4)
+            if parameter is not None and parameter != '':
+                for par in parameter.split(','):
+                    self.parameters.append(par.strip())
+            self.type = Type.METHOD
+        else:
+            self.type = Type.FIELD
+            self.member_name = match.group(5)
+
+class Type(Enum):
+    METHOD = 1
+    FIELD = 2

@@ -52,8 +52,10 @@ def load_classes(url, pkgs, members):
         package = e['p']
         module = find_module(package, pkgs)
         methods = list()
+        fields = list()
 
-        klass = Klass(module, package, name, methods, build_url(url, module, package, name, None))
+        klass_url = build_klass_url(url, module, package, name)
+        klass = Klass(module, package, name, methods, fields, klass_url)
 
         i = f'{package}.{name}'
 
@@ -62,26 +64,27 @@ def load_classes(url, pkgs, members):
 
             # get through all members of class
             for m in members[i]:
+                # u in only included if reference types are parameters. No parameters + only primitives -> l
                 index = 'u' if 'u' in m else 'l'
                 m_name = urllib.parse.unquote(m[index].split('(', 1)[0])  ## get name -> split at ( and get first half
                 parameters = list()
 
-                # u in only included if reference types are parameters. No parameters + only primitives -> l
                 raw = m[index]
                 if '(' in raw:  # just exclude fields for now
                     u_split = raw.split('(', 1)[1].removesuffix(')')
                     if len(u_split) != 0:
                         for p in u_split.split(','):
                             parameters.append(p.strip())
-
-                methods.append(Method(klass, m_name, parameters, build_url(url, module, package, name, m)))
+                    methods.append(Method(klass, m_name, parameters, build_method_url(klass_url, m)))
+                else: # is field
+                    fields.append(Field(m_name, build_field_url(klass_url, m_name)))
 
         klasses.setdefault(name, list()).append(klass)
 
     return klasses
 
 
-def build_url(base, module, package, klass_name, m):
+def build_klass_url(base, module, package, klass_name):
     # append module name if given
     if module is not None: base = f'{base}/{module}'
     # append package name
@@ -90,14 +93,13 @@ def build_url(base, module, package, klass_name, m):
     base = f'{base}/{klass_name}'
 
     # append .html
-    base = base + '.html'
+    return base + '.html'
 
-    # optional: append method name
-    if m is not None:
-        base = f'{base}#{(m['u'] if 'u' in m else m['l'])}'
+def build_method_url(klass_url, m):
+    return f'{klass_url}#{(m['u'] if 'u' in m else m['l'])}'
 
-    return base
-
+def build_field_url(klass_url, field_name):
+    return f'{klass_url}#{field_name}'
 
 def load_packages(url):
     data = read_url_json(url + '/package-search-index.js', 'packageSearchIndex = ')
