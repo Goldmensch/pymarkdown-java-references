@@ -1,0 +1,20 @@
+name: test.yml
+on: push
+
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: nix develop
+      - name: Install poetry dependencies
+        run: |
+          poetry install
+      - name: Run tests
+        run: |
+          poetry run -n auto --dist=loadfile -o log_cli=true
+
