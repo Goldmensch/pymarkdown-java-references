@@ -26,3 +26,24 @@ def test_autolink_with_parameters():
 def test_autolink_in_codeblock():
     expected = '<p><code>&lt;String#join(CharSequence, CharSequence...)&gt;</code></p>'
     compare(expected, "`<String#join(CharSequence, CharSequence...)>`")
+
+def test_javadoc_alias_whole_url():
+    urls = [
+        'https://docs.oracle.com/en/java/javase/24/docs/api/',
+        'https://docs.oracle.com/javase/8/docs/api/'
+    ]
+
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></p>'
+    compare(expected, "<https://docs.oracle.com/javase/8/docs/api/ -> String>", urls)
+
+def test_javadoc_alias_custom_alias():
+    urls = [
+        'https://docs.oracle.com/en/java/javase/24/docs/api/',
+        {
+            'alias': 'jdk8',
+            'url': 'https://docs.oracle.com/javase/8/docs/api/'
+        }
+    ]
+
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></p>'
+    compare(expected, "<jdk8 -> String>", urls)

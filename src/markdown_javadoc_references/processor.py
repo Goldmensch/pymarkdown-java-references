@@ -14,11 +14,6 @@ from .reference import raw_pattern as ref_pattern
 logger = logging.getLogger(__name__)
 
 
-def process_url(url):
-    stripped_url = url.removesuffix('/')
-    return docsite.load(stripped_url)
-
-
 def match(klasses, reference):
     # search in each class
     for klass in klasses:
@@ -57,16 +52,28 @@ def match(klasses, reference):
 
     return None
 
+def process_url(url):
+    stripped_url = url.removesuffix('/')
+    return docsite.load(stripped_url)
 
 class JavaDocProcessor(Treeprocessor):
     def __init__(self, md, urls):
         super().__init__(md)
+        self.sites = dict()
 
-        self.sites = list()
+        for entry in urls:
+            if isinstance(entry, str):
+                site = process_url(entry)
+                self.sites[entry.strip()] = site
+            elif isinstance(entry, dict) and 'alias' in entry and 'url' in entry:
+                site = process_url(entry['url'])
+                self.sites[entry['alias'].strip()] = site
+            else:
+                raise TypeError(
+                    f"Invalid entry in urls config: {entry!r}. "
+                    f"Expected string or dict with 'alias' and 'url'."
+                )
 
-        with ThreadPoolExecutor() as executor:
-            results = list(executor.map(process_url, urls))
-            self.sites.extend(results)
 
     def run(self, root):
         for el in root.iter('a'):
@@ -88,7 +95,10 @@ class JavaDocProcessor(Treeprocessor):
 
     def find_matching_javadoc(self, reference):
         matches = list()
-        for site in self.sites:
+        for alias, site in self.sites.items():
+            if reference.javadoc_alias is not None:
+                if alias != reference.javadoc_alias: continue
+
             klasses = site.klasses_for_ref(reference)
             link = match(klasses, reference)
             if link is not None: matches.append(link)
@@ -104,5 +114,5 @@ class AutoLinkJavaDocProcessor(InlineProcessor):
         text = m.group(1)
         el = etree.Element('a')
         el.set('href', text)
-        el.text = text
+        el.text = m.group('whole_ref')
         return el, m.start(0), m.end(0)
