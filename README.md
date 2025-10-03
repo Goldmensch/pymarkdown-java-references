@@ -6,6 +6,8 @@ This [python markdown extension](https://github.com/Python-Markdown/markdown) ad
 your markdown to link to their documentation. It supports both Javadoc prior to Java 9 and from Java 9 onwards.
 
 ## Installation
+You can find the [extension on PyPi](https://pypi.org/project/markdown_javadoc_references/) under `markdown_javadoc_references`.
+
 ### With plain [python markdown](https://github.com/jackdewinter/pymarkdown)
 To use this extension with the API of [python markdown](https://github.com/jackdewinter/pymarkdown), just add
 `JavaDocRefExtension` to the list of your extensions and provide the URLs to use.
