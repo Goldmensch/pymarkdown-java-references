@@ -1,14 +1,12 @@
-import logging
 import urllib.parse
-from concurrent.futures import ThreadPoolExecutor
 
 from bs4 import BeautifulSoup
 
 from .util import read_url
 from ..entities import *
+from ..util import get_logger
 
-logger = logging.getLogger(__name__)
-
+logger = get_logger(__name__)
 
 def load(url):
     # info is intended
@@ -26,16 +24,19 @@ def load(url):
 
 
 def load_class(url, c):
+    logger.debug(f"Loading jdk8 class: {url}")
     name = c.get_text(strip=True)
     package = c.get('title').split()[-1]
 
     klass = Klass(None, package, name, None, None, f'{url}/{c.get('href')}')
-    logger.info(f'Loading {package}.{name} from {klass.url}')
+    logger.debug(f'Loaded {package}.{name} from {klass.url}')
 
     return klass
 
 
 def load_members(url, klass):
+    logger.debug(f"Loading members for: {klass}")
+
     text = read_url(url)
     klass.methods = list()
     klass.fields = list()
@@ -73,6 +74,7 @@ def load_members(url, klass):
 
 
         klass.methods.append(Method(klass, member_name, new_params, unquoted_url))
+    logger.debug(f"Found {len(klass.methods)} classes and {len(klass.fields)} fields for {klass.name} ({klass.url})")
 
 class Jdk8:
     def __init__(self, klasses):
@@ -82,6 +84,11 @@ class Jdk8:
     def klasses_for_ref(self, reference):
         if reference.class_name not in self.klasses: return None
         found = self.klasses[reference.class_name]
+
+        found_names = list()
+        for c in found:
+            found_names.append(f" {c.name} -> {c.url}) ||")
+        logger.debug(f"Found classes: {found_names} for reference {reference}")
 
         loaded = list()
         for klass in found:

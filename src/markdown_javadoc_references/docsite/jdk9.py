@@ -1,15 +1,14 @@
 import json
-import logging
 import urllib.parse
 
 from .util import read_url
 from ..entities import *
+from ..util import get_logger
 
-logger = logging.getLogger(__name__)
-
+logger = get_logger(__name__)
 
 def load(url):
-    logger.debug(f'Load java 9 doc: {url}')
+    logger.debug(f'Loading java 9 doc: {url}')
 
     packages = load_packages(url)
     members = load_members(url)
@@ -32,6 +31,8 @@ def find_module(name, pkgs):
 
 
 def load_members(url):
+    logger.debug(f"Load members for {url}")
+
     data = read_url_json(url + '/member-search-index.js', 'memberSearchIndex = ')
 
     index = dict()
@@ -42,6 +43,8 @@ def load_members(url):
 
 
 def load_classes(url, pkgs, members):
+    logger.debug(f"Load classes for {url}")
+
     data = read_url_json(url + '/type-search-index.js', 'typeSearchIndex = ')
     klasses = dict()
 
@@ -102,6 +105,8 @@ def build_field_url(klass_url, field_name):
     return f'{klass_url}#{field_name}'
 
 def load_packages(url):
+    logger.debug(f"Load packages for {url}")
+
     data = read_url_json(url + '/package-search-index.js', 'packageSearchIndex = ')
 
     index = dict()

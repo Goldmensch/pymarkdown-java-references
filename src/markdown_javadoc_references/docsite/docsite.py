@@ -1,4 +1,4 @@
-import logging
+
 from functools import lru_cache
 
 import requests.exceptions
@@ -6,9 +6,9 @@ import requests.exceptions
 from .jdk8 import load as jdk8_load
 from .jdk9 import load as jdk9_load
 from .util import check_url
+from ..util import get_logger
 
-
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 @lru_cache(maxsize=None)
 def load(url):

@@ -6,7 +6,9 @@ from .reference import Type
 
 import xml.etree.ElementTree as etree
 
-logger = logging.getLogger(__name__)
+from .util import get_logger
+
+logger = get_logger(__name__)
 
 def match(klasses, reference):
     # search in each class
@@ -47,6 +49,8 @@ def match(klasses, reference):
     return None
 
 def process_url(url):
+    logger.debug(f"Process url {url}")
+
     stripped_url = url.removesuffix('/')
     return docsite.load(stripped_url)
 
@@ -70,6 +74,8 @@ class Resolver:
                 )
 
     def resolve(self, text, href):
+        logger.debug(f"Resolving link with text {text} and reference {href}")
+
         el = etree.Element('a')
         el.text = text
         el.set('href', href)
@@ -88,6 +94,8 @@ class Resolver:
             else:
                 url = links[0]
                 el.set('href', url)
+        else:
+            logger.debug(f"Invalid reference for {text} and {href}")
 
         return el
 

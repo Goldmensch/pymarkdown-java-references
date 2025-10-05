@@ -3,8 +3,9 @@ import logging
 from markdown.inlinepatterns import InlineProcessor
 
 from .reference import raw_pattern as ref_pattern
+from .util import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 java_doc_pattern = rf'\[(.*)\]\[\[({ref_pattern[:-1]})\]\]'
 class JavaDocProcessor(InlineProcessor):
@@ -13,6 +14,7 @@ class JavaDocProcessor(InlineProcessor):
         self.resolver = resolver
 
     def handleMatch(self, m, data):
+        logger.debug(f"Handle explict link match: {m.group(0)}")
         return self.resolver.resolve(m.group(1), m.group(2)), m.start(0), m.end(0)
 
 
@@ -23,4 +25,5 @@ class AutoLinkJavaDocProcessor(InlineProcessor):
         self.resolver = resolver
 
     def handleMatch(self, m, data):
+        logger.debug(f"Handle auto link match: {m.group(0)}")
         return self.resolver.resolve(m.group('whole_ref'), m.group(1)), m.start(0), m.end(0)
