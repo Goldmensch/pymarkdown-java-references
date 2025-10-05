@@ -36,6 +36,14 @@ def test_only_class():
     expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html">String</a></p>'
     compare(expected, "[String][[String]]")
 
+def test_only_class_with_subclass():
+    expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.desktop/javax/sound/sampled/EnumControl.Type.html">EnumControl.Type</a></p>'
+    compare(expected, "[EnumControl.Type][[EnumControl.Type]]")
+
+def test_with_package_with_subclass():
+    expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.desktop/javax/sound/sampled/EnumControl.Type.html">EnumControl.Type</a></p>'
+    compare(expected, "[EnumControl.Type][[javax.sound.sampled.EnumControl.Type]]")
+
 def test_only_class_not_existing():
     expected = '<p><a href="NotExistingClass">Invalid reference to NotExistingClass</a></p>'
     compare(expected, "[String][[NotExistingClass]]")

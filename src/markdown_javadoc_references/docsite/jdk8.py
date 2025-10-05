@@ -18,7 +18,10 @@ def load(url):
 
     for anchor in soup.find('body').find('div').find('ul').select('a[href]'):
         klass = load_class(url, anchor)
-        klasses.setdefault(klass.name, []).append(klass)
+
+        # append subclasses as individual classes
+        for name in klass.name.split('.'):
+            klasses.setdefault(name, []).append(klass)
 
     return Jdk8(klasses)
 

@@ -19,6 +19,14 @@ def test_only_class_not_existing():
     expected = '<p><a href="NotExistingClass">Invalid reference to NotExistingClass</a></p>'
     compare(expected, "[String][[NotExistingClass]]")
 
+def test_only_class_with_subclass():
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/EnumControl.Type.html">EnumControl.Type</a></p>'
+    compare(expected, "[EnumControl.Type][[EnumControl.Type]]")
+
+def test_with_package_with_subclass():
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/javax/sound/sampled/EnumControl.Type.html">EnumControl.Type</a></p>'
+    compare(expected, "[EnumControl.Type][[javax.sound.sampled.EnumControl.Type]]")
+
 def test_field_reference():
     expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html#CASE_INSENSITIVE_ORDER">String#CASE_INSENSITIVE_ORDER</a></p>'
     compare(expected, "<String#CASE_INSENSITIVE_ORDER>")

@@ -10,11 +10,19 @@ from .util import get_logger
 
 logger = get_logger(__name__)
 
-def match(klasses, reference):
+def matches(klasses, reference):
+    links = list()
+
     # search in each class
     for klass in klasses:
-        # compare package if given
-        if reference.package is not None and (klass.package != reference.package): continue
+        joined_klass = klass.package + '.' + klass.name
+
+        # if package is given -> compare package + class. Subclasses in references are treated as package
+        if reference.package is not None:
+            joined_reference = reference.package + '.' + reference.class_name
+            if not joined_klass.endswith(joined_reference): continue
+        elif not joined_klass.endswith(reference.class_name): continue
+
         # compare method if given
         if reference.member_name is not None:
             if reference.type == Type.METHOD:
@@ -33,7 +41,7 @@ def match(klasses, reference):
                         if not m_p.endswith(r_p): parameter_match = False
                     if not parameter_match: continue
 
-                    return method.url
+                    links.append(method.url)
             else:
                 # get all fields
                 fields = klass.fields
@@ -41,12 +49,12 @@ def match(klasses, reference):
                 # compare each field
                 for field in fields:
                     if reference.member_name != field.name: continue
-                    return field.url
+                    links.append(field.url)
 
         else:  # if not given, just reference found class
-            return klass.url
+            links.append(klass.url)
 
-    return None
+    return links
 
 def process_url(url):
     logger.debug(f"Process url {url}")
@@ -100,13 +108,12 @@ class Resolver:
         return el
 
     def find_matching_javadoc(self, reference):
-        matches = list()
+        links = list()
         for alias, site in self.sites.items():
             if reference.javadoc_alias is not None:
                 if alias != reference.javadoc_alias: continue
 
             klasses = site.klasses_for_ref(reference)
             if klasses is None: continue
-            link = match(klasses, reference)
-            if link is not None: matches.append(link)
-        return matches
+            links.extend(matches(klasses, reference))
+        return links
