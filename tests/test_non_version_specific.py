@@ -8,7 +8,7 @@ default_urls = [
 def compare(expected, text, urls=default_urls):
     result = markdown.markdown(text, extensions=[JavaDocRefExtension(urls=urls)])
 
-    assert expected == result
+    assert result == expected
 
 ### non version specific tests
 def test_normal_autolink_still_work():

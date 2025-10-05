@@ -25,7 +25,7 @@ urls = [
     }
 ]
 
-text = 'your markdown text'
+text = 'your markdown text with reference [String][java.lang.String]'
 result = markdown.markdown(text, extensions=[JavaDocRefExtension(urls=urls)])
 ```
 
@@ -44,13 +44,13 @@ markdown_extensions:
 
 ## Usage
 Referencing java methods, classes or fields is similar to how it is done in normal javadoc comments, for example
-`[String#concat(String)](String#concat(String))` will result in [String#concat(String)](https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html#concat(java.lang.String))
+`[String#concat(String)][String#concat(String)]` will result in [String#concat(String)](https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html#concat(java.lang.String))
 
 ### Autolinks
 Often times the text presented to the user is the same as the javadoc reference.
 For this common case you can use the autolink syntax to avoid writing it twice.
 
-`<String#concat(String)>` is the same as `[String#concat(String)](String#concat(String))`
+`<String#concat(String)>` is the same as `[String#concat(String)][String#concat(String)]`
 
 ### Packages
 To clarify which class to use, you can add a package in front of it:
@@ -63,9 +63,7 @@ Furthermore, you can also a package to method parameters:
 > If multiple matches are found for a reference, the reference will be marked as "Invalid"!
 
 ### Fields
-Like methods, fields can be referred to in a similar style with the small detail of double `#`: `<String##CASE_INSENSITIVE_ORDER>` will link to [String#CASE_INSENSITIVE_ORDER](https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html#CASE_INSENSITIVE_ORDER)
-
-The double `#` is necessary to avoid conflicts with markdowns native headline linking.
+Like methods, fields can be referred to in a similar style `<String##CASE_INSENSITIVE_ORDER>` will link to [String#CASE_INSENSITIVE_ORDER](https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html#CASE_INSENSITIVE_ORDER)
 
 ### Constructors
 To refer to constructors, just add `<init>` in the place where the method name would be:

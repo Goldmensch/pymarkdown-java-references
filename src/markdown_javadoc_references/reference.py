@@ -2,7 +2,7 @@ from enum import Enum
 
 import re
 
-raw_pattern = r'(?:(?P<doc>.+) *-> *)?(?P<whole_ref>(?P<pkg>[\w.]*\.)?(?P<klass>\w+)(?:#(?:(?P<method><?\w+>?)\((?P<params>.*)\))|(?:##(?P<field>\w+)))?)$'
+raw_pattern = r'(?:(?P<doc>.+) *-> *)?(?P<whole_ref>(?P<pkg>[\w.]*\.)?(?P<klass>\w+)(?:#(?:(?P<method><?\w+>?)\((?P<params>.*)\))|(?:#(?P<field>\w+)))?)$'
 pattern = re.compile(raw_pattern)
 
 def create_or_none(raw):
