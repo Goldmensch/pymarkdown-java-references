@@ -18,7 +18,7 @@ class JavaDocProcessor(InlineProcessor):
         return self.resolver.resolve(m.group(1), m.group(2)), m.start(0), m.end(0)
 
 
-auto_link_pattern = rf'<({ref_pattern[:-1]})>$'
+auto_link_pattern = rf'<({ref_pattern[:-1]})>'
 class AutoLinkJavaDocProcessor(InlineProcessor):
     def __init__(self, md, resolver):
         super().__init__(auto_link_pattern, md)
