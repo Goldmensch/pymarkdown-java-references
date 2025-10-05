@@ -43,14 +43,16 @@ markdown_extensions:
 ```
 
 ## Usage
-Referencing java methods, classes or fields is similar to how it is done in normal javadoc comments, for example
-`[String#concat(String)][String#concat(String)]` will result in [String#concat(String)](https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html#concat(java.lang.String))
+Referencing java methods, classes or fields is similar to how it is done in normal (markdown) javadoc comments,
+with the slight change of double `[` and `]` in the second part of the reference.
+For example
+`[String#concat(String)][[String#concat(String)]]` will result in [String#concat(String)](https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html#concat(java.lang.String))
 
 ### Autolinks
 Often times the text presented to the user is the same as the javadoc reference.
 For this common case you can use the autolink syntax to avoid writing it twice.
 
-`<String#concat(String)>` is the same as `[String#concat(String)][String#concat(String)]`
+`<String#concat(String)>` is the same as `[String#concat(String)][[String#concat(String)]]`
 
 ### Packages
 To clarify which class to use, you can add a package in front of it:

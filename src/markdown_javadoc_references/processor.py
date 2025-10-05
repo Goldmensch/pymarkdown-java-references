@@ -6,7 +6,7 @@ from .reference import raw_pattern as ref_pattern
 
 logger = logging.getLogger(__name__)
 
-java_doc_pattern = rf'\[(.*)\]\[({ref_pattern[:-1]})\]'
+java_doc_pattern = rf'\[(.*)\]\[\[({ref_pattern[:-1]})\]\]'
 class JavaDocProcessor(InlineProcessor):
     def __init__(self, md, resolver):
         super().__init__(java_doc_pattern, md)
