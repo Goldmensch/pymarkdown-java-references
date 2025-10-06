@@ -8,7 +8,8 @@ class Klass:
         self.fields = fields
 
 class Field:
-    def __init__(self, name, url):
+    def __init__(self, name, url, klass):
+        self.klass = klass
         self.name = name
         self.url = url
 

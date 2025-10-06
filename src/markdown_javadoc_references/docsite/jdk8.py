@@ -54,7 +54,7 @@ def load_members(url, klass):
 
         # is field
         if len(parts) <= 1:
-            klass.fields.append(Field(member_name, unquoted_url))
+            klass.fields.append(Field(member_name, unquoted_url, klass))
 
         if member_name == klass.name: member_name = '<init>' # normalize constructor method names to <init>
         new_params = []

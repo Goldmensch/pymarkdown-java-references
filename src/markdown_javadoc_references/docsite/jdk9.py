@@ -80,7 +80,7 @@ def load_classes(url, pkgs, members):
                             parameters.append(p.strip())
                     methods.append(Method(klass, m_name, parameters, build_method_url(klass_url, m)))
                 else: # is field
-                    fields.append(Field(m_name, build_field_url(klass_url, m_name)))
+                    fields.append(Field(m_name, build_field_url(klass_url, m_name), klass))
 
         # append subclasses as individual classes
         for s_name in name.split('.'):

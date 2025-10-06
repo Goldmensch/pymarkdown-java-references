@@ -5,8 +5,8 @@ default_urls = [
     'https://docs.oracle.com/en/java/javase/24/docs/api/',
 ]
 
-def compare(expected, text, urls=default_urls):
-    result = markdown.markdown(text, extensions=[JavaDocRefExtension(urls=urls)])
+def compare(expected, text, urls=default_urls, autolink_format=''):
+    result = markdown.markdown(text, extensions=[JavaDocRefExtension(urls=urls, **{'autolink-format': autolink_format})])
 
     assert result == expected
 
@@ -18,6 +18,22 @@ def test_normal_autolink_still_work():
 def test_autolink_only_class():
     expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html">String</a></p>'
     compare(expected, "<String>")
+
+def test_autolink_only_class_with_package():
+    expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html">String</a></p>'
+    compare(expected, "<java.lang.String>")
+
+def test_autolink_only_class_with_package_custom_formatter():
+    autolink_format = """   
+    match ref:
+        case Klass():
+            return f'{ref.package}.{ref.name}'
+        case _:
+            raise ValueError("not supported")
+    """
+
+    expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html">java.lang.String</a></p>'
+    compare(expected, "<java.lang.String>", autolink_format=autolink_format)
 
 def test_autolink_with_parameters():
     expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html#join(java.lang.CharSequence,java.lang.CharSequence...)">String#join(CharSequence, CharSequence...)</a></p>'
@@ -34,7 +50,7 @@ def test_javadoc_alias_whole_url():
     ]
 
     expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></p>'
-    compare(expected, "<https://docs.oracle.com/javase/8/docs/api/ -> String>", urls)
+    compare(expected, "<https://docs.oracle.com/javase/8/docs/api/ -> String>", urls=urls)
 
 def test_javadoc_alias_custom_alias():
     urls = [
@@ -46,7 +62,7 @@ def test_javadoc_alias_custom_alias():
     ]
 
     expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></p>'
-    compare(expected, "<jdk8 -> String>", urls)
+    compare(expected, "<jdk8 -> String>", urls=urls)
 
 
 def test_site_not_found():
@@ -55,4 +71,4 @@ def test_site_not_found():
     ]
 
     expected = '<p><a href="jdk8 -&gt; String">Invalid reference to jdk8 -&gt; String</a></p>'
-    compare(expected, "<jdk8 -> String>", urls)
+    compare(expected, "<jdk8 -> String>", urls=urls)

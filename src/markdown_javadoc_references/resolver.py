@@ -11,7 +11,7 @@ from .util import get_logger
 logger = get_logger(__name__)
 
 def matches(klasses, reference):
-    links = list()
+    links = dict()
 
     # search in each class
     for klass in klasses:
@@ -41,7 +41,7 @@ def matches(klasses, reference):
                         if not m_p.endswith(r_p): parameter_match = False
                     if not parameter_match: continue
 
-                    links.append(method.url)
+                    links[method.url] = method
             else:
                 # get all fields
                 fields = klass.fields
@@ -49,10 +49,10 @@ def matches(klasses, reference):
                 # compare each field
                 for field in fields:
                     if reference.member_name != field.name: continue
-                    links.append(field.url)
+                    links[field.url] = field
 
         else:  # if not given, just reference found class
-            links.append(klass.url)
+            links[klass.url] = klass
 
     return links
 
@@ -100,20 +100,21 @@ class Resolver:
                     f'Multiple javadoc matching {href} found! Please be more specific, maybe add a pacakge? Found javadocs: {'; '.join(links)}')
                 el.text = f'Invalid reference to {href}'
             else:
-                url = links[0]
-                el.set('href', url)
+                link, ref = next(iter(links.items()))
+                el.set('href', link)
+                return ref, el
         else:
             logger.debug(f"Invalid reference for {text} and {href}")
 
-        return el
+        return None, el
 
     def find_matching_javadoc(self, reference):
-        links = list()
+        links = dict()
         for alias, site in self.sites.items():
             if reference.javadoc_alias is not None:
                 if alias != reference.javadoc_alias: continue
 
             klasses = site.klasses_for_ref(reference)
             if klasses is None: continue
-            links.extend(matches(klasses, reference))
+            links |= matches(klasses, reference)
         return links
