@@ -3,15 +3,21 @@ from functools import lru_cache
 
 import requests.exceptions
 
-from .jdk8 import load as jdk8_load
-from .jdk9 import load as jdk9_load
 from .util import check_url
+from ..entities import Klass
 from ..util import get_logger
 
 logger = get_logger(__name__)
 
+class Docsite:
+    def klasses_for_ref(self, reference) -> list[Klass]:
+        pass
+
 @lru_cache(maxsize=None)
-def load(url):
+def load(url: str) -> Docsite | None:
+    from .jdk8 import load as jdk8_load
+    from .jdk9 import load as jdk9_load
+
     # check if url is reachable
     try:
         resp = check_url(url)

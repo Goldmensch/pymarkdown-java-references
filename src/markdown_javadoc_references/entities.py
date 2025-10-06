@@ -1,7 +1,9 @@
 import re
 
+class Entity:
+    pass
 
-class Klass:
+class Klass(Entity):
     """
     Represents a resolved reference class.
 
@@ -21,7 +23,7 @@ class Klass:
         The url pointing to the javadoc site of this class
     """
 
-    def __init__(self, module, package, name, methods, fields, url):
+    def __init__(self, module: str | None, package: str, name: str, methods: list['Method'], fields: list['Field'], url: str):
         self.module = module
         self.package = package
         self.name = name
@@ -29,7 +31,7 @@ class Klass:
         self.url = url
         self.fields = fields
 
-class Field:
+class Field(Entity):
     """
     Represents a resolved reference to a field.
 
@@ -44,12 +46,12 @@ class Field:
     """
 
 
-    def __init__(self, name, url, klass):
+    def __init__(self, name: str, url: str, klass: Klass):
         self.klass = klass
         self.name = name
         self.url = url
 
-class Method:
+class Method(Entity):
     """
     Represents a resolved reference to a method.
 
@@ -77,13 +79,13 @@ class Method:
         Returns a string consisting of the parameter names from `parameter_names()` joined together by `, `
     """
 
-    def __init__(self, klass, name, parameters, url):
+    def __init__(self, klass: Klass, name: str, parameters: list[str], url: str):
         self.klass = klass
         self.name = name
         self.parameters = parameters
         self.url = url
 
-    def parameter_names(self):
+    def parameter_names(self) -> list[str]:
         params = list()
         for p in self.parameters:
             matched = re.search(r"[A-Z]", p)
@@ -94,5 +96,5 @@ class Method:
                 params.append(p)
         return params
 
-    def parameter_names_joined(self):
+    def parameter_names_joined(self) -> str:
         return ", ".join(self.parameter_names())

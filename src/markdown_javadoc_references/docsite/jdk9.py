@@ -1,13 +1,15 @@
 import json
 import urllib.parse
 
+from .docsite import Docsite
 from .util import read_url
 from ..entities import *
+from ..reference import Reference
 from ..util import get_logger
 
 logger = get_logger(__name__)
 
-def load(url):
+def load(url: str) -> Docsite:
     logger.debug(f'Loading java 9 doc: {url}')
 
     packages = load_packages(url)
@@ -17,20 +19,20 @@ def load(url):
     return Jdk9(klasses)
 
 
-def read_url_json(url, prefix):
+def read_url_json(url: str, prefix: str) -> list[dict[str, str]]:
     text = read_url(url)
     plain = text.removeprefix(prefix).removesuffix(';updateSearchResults();').strip()
     return json.loads(plain)
 
 
-def find_module(name, pkgs):
+def find_module(name: str, pkgs: dict[str, dict[str, str]]) -> str | None:
     e = pkgs[name]
     if 'm' in e:
         return e['m']
     return None
 
 
-def load_members(url):
+def load_members(url: str) -> dict[str, list[dict[str, str]]]:
     logger.debug(f"Load members for {url}")
 
     data = read_url_json(url + '/member-search-index.js', 'memberSearchIndex = ')
@@ -42,7 +44,7 @@ def load_members(url):
     return index
 
 
-def load_classes(url, pkgs, members):
+def load_classes(url: str, pkgs: dict[str, dict[str, str]], members: dict[str, list[dict[str, str]]]) -> dict[str, list[Klass]]:
     logger.debug(f"Load classes for {url}")
 
     data = read_url_json(url + '/type-search-index.js', 'typeSearchIndex = ')
@@ -89,7 +91,7 @@ def load_classes(url, pkgs, members):
     return klasses
 
 
-def build_klass_url(base, module, package, klass_name):
+def build_klass_url(base: str, module: str | None, package: str, klass_name: str) -> str:
     # append module name if given
     if module is not None: base = f'{base}/{module}'
     # append package name
@@ -100,13 +102,13 @@ def build_klass_url(base, module, package, klass_name):
     # append .html
     return base + '.html'
 
-def build_method_url(klass_url, m):
+def build_method_url(klass_url: str, m: dict[str, str]) -> str:
     return f'{klass_url}#{(m['u'] if 'u' in m else m['l'])}'
 
-def build_field_url(klass_url, field_name):
+def build_field_url(klass_url: str, field_name: str) -> str:
     return f'{klass_url}#{field_name}'
 
-def load_packages(url):
+def load_packages(url: str) -> dict[str, dict[str, str]]:
     logger.debug(f"Load packages for {url}")
 
     data = read_url_json(url + '/package-search-index.js', 'packageSearchIndex = ')
@@ -116,9 +118,9 @@ def load_packages(url):
         index[e['l']] = e
     return index
 
-class Jdk9:
-    def __init__(self, klasses):
+class Jdk9(Docsite):
+    def __init__(self, klasses: dict[str, list[Klass]]):
         self.klasses = klasses
 
-    def klasses_for_ref(self, reference):
-        return self.klasses[reference.class_name] if reference.class_name in self.klasses else None
+    def klasses_for_ref(self, reference: Reference) -> list[Klass]:
+        return self.klasses[reference.class_name] if reference.class_name in self.klasses else list()

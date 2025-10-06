@@ -5,11 +5,6 @@ import re
 raw_pattern = r'(?:(?P<doc>.+) *-> *)?(?P<whole_ref>(?P<pkg>[\w.]*\.)?(?P<klass>\w+)(?:#(?:(?P<method><?\w+>?)\((?P<params>.*)\))|(?:#(?P<field>\w+)))?)$'
 pattern = re.compile(raw_pattern)
 
-def create_or_none(raw):
-    match = pattern.match(raw)
-    return Reference(match) if match else None
-
-
 class Reference:
     def __init__(self, match: re.Match):
         """
@@ -25,7 +20,7 @@ class Reference:
         group field: field name
         """
 
-        self.javadoc_alias = match.group('doc')
+        self.javadoc_alias: str = match.group('doc')
         if self.javadoc_alias is not None:
             self.javadoc_alias = self.javadoc_alias.strip()
 
@@ -51,3 +46,7 @@ class Reference:
 class Type(Enum):
     METHOD = 1
     FIELD = 2
+
+def create_or_none(raw: str) -> Reference | None:
+    match = pattern.match(raw)
+    return Reference(match) if match else None

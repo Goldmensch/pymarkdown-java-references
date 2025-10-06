@@ -1,14 +1,17 @@
 import urllib.parse
 
 from bs4 import BeautifulSoup
+from bs4.element import Tag
 
+from .docsite import Docsite
 from .util import read_url
 from ..entities import *
+from ..reference import Reference
 from ..util import get_logger
 
 logger = get_logger(__name__)
 
-def load(url):
+def load(url: str) -> Docsite:
     # info is intended
     logger.info(f'Loading java 8 docs.. may take a while: {url}')
 
@@ -26,7 +29,8 @@ def load(url):
     return Jdk8(klasses)
 
 
-def load_class(url, c):
+# noinspection PyTypeChecker
+def load_class(url: str, c: Tag) -> Klass:
     logger.debug(f"Loading jdk8 class: {url}")
     name = c.get_text(strip=True)
     package = c.get('title').split()[-1]
@@ -37,7 +41,7 @@ def load_class(url, c):
     return klass
 
 
-def load_members(url, klass):
+def load_members(url: str, klass: Klass):
     logger.debug(f"Loading members for: {klass}")
 
     text = read_url(url)
@@ -79,13 +83,13 @@ def load_members(url, klass):
         klass.methods.append(Method(klass, member_name, new_params, unquoted_url))
     logger.debug(f"Found {len(klass.methods)} classes and {len(klass.fields)} fields for {klass.name} ({klass.url})")
 
-class Jdk8:
+class Jdk8(Docsite):
     def __init__(self, klasses):
         self.klasses = klasses
 
     # lazy load
-    def klasses_for_ref(self, reference):
-        if reference.class_name not in self.klasses: return None
+    def klasses_for_ref(self, reference: Reference) -> list[Klass]:
+        if reference.class_name not in self.klasses: return list()
         found = self.klasses[reference.class_name]
 
         found_names = list()

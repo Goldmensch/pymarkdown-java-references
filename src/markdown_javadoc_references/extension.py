@@ -1,3 +1,4 @@
+from markdown.core import Markdown
 from markdown.extensions import Extension
 
 from .processor.javadoc import JavaDocProcessor
@@ -16,7 +17,7 @@ class JavaDocRefExtension(Extension):
 
         super().__init__(**kwargs)
 
-    def extendMarkdown(self, md):
+    def extendMarkdown(self, md: Markdown):
         logger.debug("extendMarkdown called.. (JavaDocRefExtension)")
 
         resolver = Resolver(self.getConfig("urls"))

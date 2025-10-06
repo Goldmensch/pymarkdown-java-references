@@ -1,14 +1,14 @@
-import logging
-
 from .docsite import docsite
 from .reference import create_or_none
 from .reference import Type
+from .entities import Entity
 
 import xml.etree.ElementTree as etree
 
 from .util import get_logger
 
 logger = get_logger(__name__)
+
 
 def matches(klasses, reference):
     links = dict()
@@ -21,7 +21,8 @@ def matches(klasses, reference):
         if reference.package is not None:
             joined_reference = reference.package + '.' + reference.class_name
             if not joined_klass.endswith(joined_reference): continue
-        elif not joined_klass.endswith(reference.class_name): continue
+        elif not joined_klass.endswith(reference.class_name):
+            continue
 
         # compare method if given
         if reference.member_name is not None:
@@ -56,11 +57,13 @@ def matches(klasses, reference):
 
     return links
 
+
 def process_url(url):
     logger.debug(f"Process url {url}")
 
     stripped_url = url.removesuffix('/')
     return docsite.load(stripped_url)
+
 
 class Resolver:
     def __init__(self, urls):
@@ -81,34 +84,34 @@ class Resolver:
                     f"Expected string or dict with 'alias' and 'url'."
                 )
 
-    def resolve(self, text, href):
-        logger.debug(f"Resolving link with text {text} and reference {href}")
+    def resolve(self, text: str, ref: str) -> tuple[Entity | None, etree.Element]:
+        logger.debug(f"Resolving link with text {text} and reference {ref}")
 
         el = etree.Element('a')
         el.text = text
-        el.set('href', href)
+        el.set('href', ref)
 
-        reference = create_or_none(href)
+        reference = create_or_none(ref)
         if reference is not None:
             links = self.find_matching_javadoc(reference)
 
             if len(links) == 0:
-                logger.warning(f'No javadoc matching {href} was found!')
-                el.text = f'Invalid reference to {href}'
+                logger.warning(f'No javadoc matching {ref} was found!')
+                el.text = f'Invalid reference to {ref}'
             elif len(links) > 1:
                 logger.warning(
-                    f'Multiple javadoc matching {href} found! Please be more specific, maybe add a pacakge? Found javadocs: {'; '.join(links)}')
-                el.text = f'Invalid reference to {href}'
+                    f'Multiple javadoc matching {ref} found! Please be more specific, maybe add a pacakge? Found javadocs: {'; '.join(links)}')
+                el.text = f'Invalid reference to {ref}'
             else:
                 link, ref = next(iter(links.items()))
                 el.set('href', link)
                 return ref, el
         else:
-            logger.debug(f"Invalid reference for {text} and {href}")
+            logger.debug(f"Invalid reference for {text} and {ref}")
 
         return None, el
 
-    def find_matching_javadoc(self, reference):
+    def find_matching_javadoc(self, reference) -> dict[str, Entity]:
         links = dict()
         for alias, site in self.sites.items():
             if reference.javadoc_alias is not None:
