@@ -20,7 +20,8 @@ def _matches(klasses, reference):
         # if package is given -> compare package + class. Subclasses in references are treated as package
         if reference.package is not None:
             joined_reference = reference.package + '.' + reference.class_name
-            if not joined_klass.endswith(joined_reference): continue
+            if not joined_klass.endswith(joined_reference):
+                continue
         elif not joined_klass.endswith(reference.class_name):
             continue
 
@@ -32,15 +33,19 @@ def _matches(klasses, reference):
                 # search in each member
                 for method in methods:
                     # compare method name
-                    if reference.member_name != method.name: continue
+                    if reference.member_name != method.name:
+                        continue
                     # compare parameter size
-                    if len(reference.parameters) != len(method.parameters): continue
+                    if len(reference.parameters) != len(method.parameters):
+                        continue
 
                     # compare parameters
                     parameter_match = True
                     for r_p, m_p in zip(reference.parameters, method.parameters):
-                        if not m_p.endswith(r_p): parameter_match = False
-                    if not parameter_match: continue
+                        if not m_p.endswith(r_p):
+                            parameter_match = False
+                    if not parameter_match:
+                        continue
 
                     links[method.url] = method
             else:
@@ -49,8 +54,8 @@ def _matches(klasses, reference):
 
                 # compare each field
                 for field in fields:
-                    if reference.member_name != field.name: continue
-                    links[field.url] = field
+                    if reference.member_name == field.name:
+                        links[field.url] = field
 
         else:  # if not given, just reference found class
             links[klass.url] = klass
@@ -72,11 +77,13 @@ class Resolver:
         for entry in urls:
             if isinstance(entry, str):
                 site = _process_url(entry)
-                if site is None: continue
+                if site is None:
+                    continue
                 self.sites[entry.strip()] = site
             elif isinstance(entry, dict) and 'alias' in entry and 'url' in entry:
                 site = _process_url(entry['url'])
-                if site is None: continue
+                if site is None:
+                    continue
                 self.sites[entry['alias'].strip()] = site
             else:
                 raise TypeError(
@@ -115,9 +122,11 @@ class Resolver:
         links = dict()
         for alias, site in self.sites.items():
             if reference.javadoc_alias is not None:
-                if alias != reference.javadoc_alias: continue
+                if alias != reference.javadoc_alias:
+                    continue
 
             klasses = site.klasses_for_ref(reference)
-            if klasses is None: continue
+            if klasses is None:
+                continue
             links |= _matches(klasses, reference)
         return links

@@ -22,3 +22,21 @@ jobs:
       - name: Run tests
         run: |
           poetry run pytest -n auto --dist=loadfile -o log_cli=true
+
+  lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: nix develop --command bash {0}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - run: nix develop
+      - name: Install poetry dependencies
+        run: |
+          poetry install
+      - name: Run ruff
+        run: |
+          ruff check

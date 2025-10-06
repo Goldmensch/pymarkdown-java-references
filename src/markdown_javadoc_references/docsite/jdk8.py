@@ -5,7 +5,7 @@ from bs4.element import Tag
 
 from .docsite import Docsite
 from .util import read_url
-from ..entities import *
+from ..entities import Klass, Method, Field
 from ..reference import Reference
 from ..util import get_logger
 
@@ -35,7 +35,7 @@ def _load_class(url: str, c: Tag) -> Klass:
     name = c.get_text(strip=True)
     package = c.get('title').split()[-1]
 
-    klass = Klass(None, package, name, None, None, f'{url}/{c.get('href')}')
+    klass = Klass(None, package, name, None, None, f'{url}/{c.get("href")}')
     logger.debug(f'Loaded {package}.{name} from {klass.url}')
 
     return klass
@@ -60,14 +60,16 @@ def _load_members(url: str, klass: Klass):
         if len(parts) <= 1:
             klass.fields.append(Field(member_name, unquoted_url, klass))
 
-        if member_name == klass.name: member_name = '<init>' # normalize constructor method names to <init>
+        if member_name == klass.name:
+            member_name = '<init>' # normalize constructor method names to <init>
         new_params = []
 
         # following parts are parameters
         for param in parts[1:]:
 
             # skip empty strings - they're not real parameters
-            if len(param) == 0: continue
+            if len(param) == 0:
+                continue
 
             # split at : - after it there are metadata like A for arrays
             name_split = param.split(':')
@@ -89,7 +91,8 @@ class Jdk8(Docsite):
 
     # lazy load
     def klasses_for_ref(self, reference: Reference) -> list[Klass]:
-        if reference.class_name not in self.klasses: return list()
+        if reference.class_name not in self.klasses:
+            return list()
         found = self.klasses[reference.class_name]
 
         found_names = list()

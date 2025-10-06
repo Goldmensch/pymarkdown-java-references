@@ -3,7 +3,7 @@ import urllib.parse
 
 from .docsite import Docsite
 from .util import read_url
-from ..entities import *
+from ..entities import Klass, Method, Field
 from ..reference import Reference
 from ..util import get_logger
 
@@ -39,8 +39,9 @@ def _load_members(url: str) -> dict[str, list[dict[str, str]]]:
 
     index = dict()
     for e in data:
-        if 'l' not in e or 'p' not in e: continue
-        index.setdefault(f'{e['p']}.{e['c']}', list()).append(e)
+        if 'l' not in e or 'p' not in e:
+            continue
+        index.setdefault(f'{e["p"]}.{e["c"]}', list()).append(e)
     return index
 
 
@@ -52,7 +53,8 @@ def _load_classes(url: str, pkgs: dict[str, dict[str, str]], members: dict[str, 
 
     for e in data:
         # skip non member entries
-        if 'l' not in e or 'p' not in e: continue
+        if 'l' not in e or 'p' not in e:
+            continue
         name = e['l']
         package = e['p']
         module = _find_module(package, pkgs)
@@ -93,9 +95,10 @@ def _load_classes(url: str, pkgs: dict[str, dict[str, str]], members: dict[str, 
 
 def _build_klass_url(base: str, module: str | None, package: str, klass_name: str) -> str:
     # append module name if given
-    if module is not None: base = f'{base}/{module}'
+    if module is not None:
+        base = f'{base}/{module}'
     # append package name
-    base = f'{base}/{package.replace('.', '/')}'
+    base = f"{base}/{package.replace('.', '/')}"
     # append class name
     base = f'{base}/{klass_name}'
 
@@ -103,7 +106,7 @@ def _build_klass_url(base: str, module: str | None, package: str, klass_name: st
     return base + '.html'
 
 def _build_method_url(klass_url: str, m: dict[str, str]) -> str:
-    return f'{klass_url}#{(m['u'] if 'u' in m else m['l'])}'
+    return f"{klass_url}#{(m['u'] if 'u' in m else m['l'])}"
 
 def _build_field_url(klass_url: str, field_name: str) -> str:
     return f'{klass_url}#{field_name}'

@@ -1,8 +1,9 @@
+import importlib.util
 import logging
 
 def get_logger(name: str) -> logging.Logger:
-    try:
-        import mkdocs.utils
-        return logging.getLogger(f"mkdocs.plugins.{name}")
-    except ImportError:
+    mkdocs = importlib.util.find_spec('mkdocs')
+    if mkdocs is None:
         return logging.getLogger(name)
+    else:
+        return logging.getLogger(f"mkdocs.plugins.{name}")

@@ -7,25 +7,24 @@ pattern = re.compile(raw_pattern)
 
 class Reference:
     def __init__(self, match: re.Match):
-        """
-        regex will match: alias -> java.util.com.MyClass#foo(String,int,boolean) -->
-
-        group doc: javadoc alias name
-        group pkg: package (optional)
-        group klass: class name
-        group method: method name (optional, together with parameters)
-        group params: parameters (optional, together with method name)
-
-        if field reference: java.util.com.MyClass#MY_FIELD
-        group field: field name
-        """
+        # regex will match: alias -> java.util.com.MyClass#foo(String,int,boolean) -->
+        #
+        # group doc: javadoc alias name
+        # group pkg: package (optional)
+        # group klass: class name
+        # group method: method name (optional, together with parameters)
+        # group params: parameters (optional, together with method name)
+        #
+        # if field reference: java.util.com.MyClass#MY_FIELD
+        # group field: field name
 
         self.javadoc_alias: str = match.group('doc')
         if self.javadoc_alias is not None:
             self.javadoc_alias = self.javadoc_alias.strip()
 
         self.package = match.group('pkg')
-        if self.package is not None: self.package = self.package.removesuffix('.')
+        if self.package is not None:
+            self.package = self.package.removesuffix('.')
 
         self.class_name = match.group('klass')
 

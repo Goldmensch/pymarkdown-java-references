@@ -25,6 +25,7 @@
                         git
                         python313
                         poetry
+                        ruff
            ];
          };
        };
