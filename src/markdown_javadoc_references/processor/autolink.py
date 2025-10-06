@@ -15,19 +15,9 @@ def default_formatter(ref):
         case Field():
             return f'{ref.klass.name}#{ref.name}'
         case Method():
-            params = list()
-            for p in ref.parameters:
-                matched = re.search(r"[A-Z]", p)
-                if matched:
-                    i = matched.start()
-                    params.append(p[i:])
-                else:
-                    params.append(p)
-
-            return f'{ref.klass.name}#{ref.name}({', '.join(params)})'
+            return f'{ref.klass.name}#{ref.name}({ref.parameter_names_joined()})'
         case _:
             raise ValueError("Should not occur")
-
 
 def compile_formatter(code: str):
     namespace = {

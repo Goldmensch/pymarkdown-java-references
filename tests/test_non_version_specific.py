@@ -28,8 +28,6 @@ def test_autolink_only_class_with_package_custom_formatter():
     match ref:
         case Klass():
             return f'{ref.package}.{ref.name}'
-        case _:
-            raise ValueError("not supported")
     """
 
     expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html">java.lang.String</a></p>'

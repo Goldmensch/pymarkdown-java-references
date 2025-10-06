@@ -49,10 +49,42 @@ For example
 `[String#concat(String)][[String#concat(String)]]` will result in [String#concat(String)](https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html#concat(java.lang.String))
 
 ### Autolinks
-Often times the text presented to the user is the same as the javadoc reference.
+Often times the text presented to the user can be easily derived from the used reference.
 For this common case you can use the autolink syntax to avoid writing it twice.
 
 `<String#concat(String)>` is the same as `[String#concat(String)][[String#concat(String)]]`
+
+#### Formatting
+By default, the text that is presented to the user is the reference with the packages stripped.
+
+For example:
+- `<java.lang.String>` -> `[String][[java.lang.String]])`
+- `<java.lang.String#concat(java.lang.String)>` -> `[String#concat(String)][[java.lang.String#concat(java.lang.String)]]`
+- `<java.lang.String#CASE_INSENSITIVE_ORDER` -> `[String#CASE_INSENSITIVE_ORDER][[java.lang.String#CASE_INSENSITIVE_ORDER]]`
+
+To configure how the text is derived, you can provide a small python script via the config key `autolink-format`.
+In this environment, you can use the `ref` variable to get the resolved [reference entity](src/markdown_javadoc_references/entities.py).
+Now you can just use a `match` construct to define the specific formatting for each entity type.
+
+
+Example (default formatter):
+```python 
+match ref:
+    case Klass():
+        return ref.name
+    case Field():
+        return f'{ref.klass.name}#{ref.name}'
+    case Method():
+        return f'{ref.klass.name}#{ref.name}({ref.parameter_names_joined()})'
+```
+
+The provided code should just `return` the string represented to the user. Please make yourself familiar with basic python programming.
+
+The names `Klass`, `Field` and `Method` are automatically imported for you. Please take a look at the [source code](src/markdown_javadoc_references/entities.py)
+to learn more about the data and utility functions of each entity.
+
+> [!NOTE]
+> The content of this config options will be copied in as the body of a python function. 
 
 ### Packages
 To clarify which class to use, you can add a package in front of it:
@@ -65,7 +97,7 @@ Furthermore, you can also a package to method parameters:
 > If multiple matches are found for a reference, the reference will be marked as "Invalid"!
 
 ### Fields
-Like methods, fields can be referred to in a similar style `<String##CASE_INSENSITIVE_ORDER>` will link to [String#CASE_INSENSITIVE_ORDER](https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html#CASE_INSENSITIVE_ORDER)
+Like methods, fields can be referred to in a similar style `<String#CASE_INSENSITIVE_ORDER>` will link to [String#CASE_INSENSITIVE_ORDER](https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html#CASE_INSENSITIVE_ORDER)
 
 ### Constructors
 To refer to constructors, just add `<init>` in the place where the method name would be:
