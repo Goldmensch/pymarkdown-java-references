@@ -5,7 +5,7 @@ from bs4.element import Tag
 
 from .docsite import Docsite
 from .util import read_url, find_class_type
-from ..entities import Klass, Method, Field, Type
+from ..entities import Klass, Method, Field
 from ..util import get_logger
 
 logger = get_logger(__name__)

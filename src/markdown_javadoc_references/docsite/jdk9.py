@@ -1,13 +1,11 @@
 import json
 import urllib.parse
-from functools import lru_cache
 
 from bs4 import BeautifulSoup
 
 from .docsite import Docsite
 from .util import read_url, find_class_type
 from ..entities import Klass, Method, Field
-from ..reference import Reference
 from ..util import get_logger
 
 logger = get_logger(__name__)

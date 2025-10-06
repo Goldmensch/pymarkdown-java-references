@@ -21,9 +21,9 @@ def test_type_extraction_class():
     expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html">Type.CLASS</a></p>'
     compare(expected, "<java.lang.String>", autolink_format=type_extract_format)
 
-def test_type_extraction_interface():
+def test_type_extraction_annotation():
     expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/annotation/Retention.html">Type.ANN_INTERFACE</a></p>'
-    compare(expected, "<java.lang.annotations.Retention>", autolink_format=type_extract_format)
+    compare(expected, "<java.lang.annotation.Retention>", autolink_format=type_extract_format)
 
 def test_type_extraction_interface():
     expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/util/function/Function.html">Type.INTERFACE</a></p>'
