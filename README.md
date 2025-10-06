@@ -1,4 +1,5 @@
-[![PyPI version](https://badge.fury.io/py/markdown_javadoc_references.svg?icon=si%3Apython)](https://badge.fury.io/py/markdown_javadoc_references)
+[![PyPI version](https://img.shields.io/pypi/v/markdown_javadoc_references?style=flat&link=!%5BPyPI%20-%20Version%5D(https%3A%2F%2Fimg.shields.io%2Fpypi%2Fv%2Fmarkdown_javadoc_references)
+)](https://badge.fury.io/py/markdown_javadoc_references)
 # 🐍 Python Markdown Javadoc References
 Have you ever been tired of copying entire Javadoc URLs into your Markdown just to link to the documentation for some Java classes?
 That is where is extension comes in handy! 
