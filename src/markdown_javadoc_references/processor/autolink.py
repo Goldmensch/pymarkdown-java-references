@@ -11,7 +11,7 @@ from ..util import get_logger
 
 logger = get_logger(__name__)
 
-def default_formatter(ref: Entity) -> str:
+def _default_formatter(ref: Entity) -> str:
     match ref:
         case Klass():
             return ref.name
@@ -22,7 +22,7 @@ def default_formatter(ref: Entity) -> str:
         case _:
             raise ValueError("Should not occur")
 
-def compile_formatter(code: str) -> Callable[[Entity], str]:
+def _compile_formatter(code: str) -> Callable[[Entity], str]:
     namespace = {
         "Klass": Klass,
         "Method": Method,
@@ -43,7 +43,7 @@ class AutoLinkJavaDocProcessor(InlineProcessor):
     def __init__(self, md, resolver: Resolver, autolink_format: str):
         super().__init__(auto_link_pattern, md)
         self.resolver = resolver
-        self.formatter = compile_formatter(autolink_format) if autolink_format != '' else default_formatter
+        self.formatter = _compile_formatter(autolink_format) if autolink_format != '' else _default_formatter
 
     def handleMatch(self, m: re.Match, data: str):
         logger.debug(f"Handle auto link match: {m.group(0)}")

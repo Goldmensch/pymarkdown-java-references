@@ -10,7 +10,7 @@ from .util import get_logger
 logger = get_logger(__name__)
 
 
-def matches(klasses, reference):
+def _matches(klasses, reference):
     links = dict()
 
     # search in each class
@@ -58,7 +58,7 @@ def matches(klasses, reference):
     return links
 
 
-def process_url(url):
+def _process_url(url):
     logger.debug(f"Process url {url}")
 
     stripped_url = url.removesuffix('/')
@@ -71,11 +71,11 @@ class Resolver:
 
         for entry in urls:
             if isinstance(entry, str):
-                site = process_url(entry)
+                site = _process_url(entry)
                 if site is None: continue
                 self.sites[entry.strip()] = site
             elif isinstance(entry, dict) and 'alias' in entry and 'url' in entry:
-                site = process_url(entry['url'])
+                site = _process_url(entry['url'])
                 if site is None: continue
                 self.sites[entry['alias'].strip()] = site
             else:
@@ -93,7 +93,7 @@ class Resolver:
 
         reference = create_or_none(ref)
         if reference is not None:
-            links = self.find_matching_javadoc(reference)
+            links = self._find_matching_javadoc(reference)
 
             if len(links) == 0:
                 logger.warning(f'No javadoc matching {ref} was found!')
@@ -111,7 +111,7 @@ class Resolver:
 
         return None, el
 
-    def find_matching_javadoc(self, reference) -> dict[str, Entity]:
+    def _find_matching_javadoc(self, reference) -> dict[str, Entity]:
         links = dict()
         for alias, site in self.sites.items():
             if reference.javadoc_alias is not None:
@@ -119,5 +119,5 @@ class Resolver:
 
             klasses = site.klasses_for_ref(reference)
             if klasses is None: continue
-            links |= matches(klasses, reference)
+            links |= _matches(klasses, reference)
         return links

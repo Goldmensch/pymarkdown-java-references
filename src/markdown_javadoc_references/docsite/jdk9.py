@@ -12,30 +12,30 @@ logger = get_logger(__name__)
 def load(url: str) -> Docsite:
     logger.debug(f'Loading java 9 doc: {url}')
 
-    packages = load_packages(url)
-    members = load_members(url)
+    packages = _load_packages(url)
+    members = _load_members(url)
 
-    klasses =  load_classes(url, packages, members)
+    klasses =  _load_classes(url, packages, members)
     return Jdk9(klasses)
 
 
-def read_url_json(url: str, prefix: str) -> list[dict[str, str]]:
+def _read_url_json(url: str, prefix: str) -> list[dict[str, str]]:
     text = read_url(url)
     plain = text.removeprefix(prefix).removesuffix(';updateSearchResults();').strip()
     return json.loads(plain)
 
 
-def find_module(name: str, pkgs: dict[str, dict[str, str]]) -> str | None:
+def _find_module(name: str, pkgs: dict[str, dict[str, str]]) -> str | None:
     e = pkgs[name]
     if 'm' in e:
         return e['m']
     return None
 
 
-def load_members(url: str) -> dict[str, list[dict[str, str]]]:
+def _load_members(url: str) -> dict[str, list[dict[str, str]]]:
     logger.debug(f"Load members for {url}")
 
-    data = read_url_json(url + '/member-search-index.js', 'memberSearchIndex = ')
+    data = _read_url_json(url + '/member-search-index.js', 'memberSearchIndex = ')
 
     index = dict()
     for e in data:
@@ -44,10 +44,10 @@ def load_members(url: str) -> dict[str, list[dict[str, str]]]:
     return index
 
 
-def load_classes(url: str, pkgs: dict[str, dict[str, str]], members: dict[str, list[dict[str, str]]]) -> dict[str, list[Klass]]:
+def _load_classes(url: str, pkgs: dict[str, dict[str, str]], members: dict[str, list[dict[str, str]]]) -> dict[str, list[Klass]]:
     logger.debug(f"Load classes for {url}")
 
-    data = read_url_json(url + '/type-search-index.js', 'typeSearchIndex = ')
+    data = _read_url_json(url + '/type-search-index.js', 'typeSearchIndex = ')
     klasses = dict()
 
     for e in data:
@@ -55,11 +55,11 @@ def load_classes(url: str, pkgs: dict[str, dict[str, str]], members: dict[str, l
         if 'l' not in e or 'p' not in e: continue
         name = e['l']
         package = e['p']
-        module = find_module(package, pkgs)
+        module = _find_module(package, pkgs)
         methods = list()
         fields = list()
 
-        klass_url = build_klass_url(url, module, package, name)
+        klass_url = _build_klass_url(url, module, package, name)
         klass = Klass(module, package, name, methods, fields, klass_url)
 
         i = f'{package}.{name}'
@@ -80,9 +80,9 @@ def load_classes(url: str, pkgs: dict[str, dict[str, str]], members: dict[str, l
                     if len(u_split) != 0:
                         for p in u_split.split(','):
                             parameters.append(p.strip())
-                    methods.append(Method(klass, m_name, parameters, build_method_url(klass_url, m)))
+                    methods.append(Method(klass, m_name, parameters, _build_method_url(klass_url, m)))
                 else: # is field
-                    fields.append(Field(m_name, build_field_url(klass_url, m_name), klass))
+                    fields.append(Field(m_name, _build_field_url(klass_url, m_name), klass))
 
         # append subclasses as individual classes
         for s_name in name.split('.'):
@@ -91,7 +91,7 @@ def load_classes(url: str, pkgs: dict[str, dict[str, str]], members: dict[str, l
     return klasses
 
 
-def build_klass_url(base: str, module: str | None, package: str, klass_name: str) -> str:
+def _build_klass_url(base: str, module: str | None, package: str, klass_name: str) -> str:
     # append module name if given
     if module is not None: base = f'{base}/{module}'
     # append package name
@@ -102,16 +102,16 @@ def build_klass_url(base: str, module: str | None, package: str, klass_name: str
     # append .html
     return base + '.html'
 
-def build_method_url(klass_url: str, m: dict[str, str]) -> str:
+def _build_method_url(klass_url: str, m: dict[str, str]) -> str:
     return f'{klass_url}#{(m['u'] if 'u' in m else m['l'])}'
 
-def build_field_url(klass_url: str, field_name: str) -> str:
+def _build_field_url(klass_url: str, field_name: str) -> str:
     return f'{klass_url}#{field_name}'
 
-def load_packages(url: str) -> dict[str, dict[str, str]]:
+def _load_packages(url: str) -> dict[str, dict[str, str]]:
     logger.debug(f"Load packages for {url}")
 
-    data = read_url_json(url + '/package-search-index.js', 'packageSearchIndex = ')
+    data = _read_url_json(url + '/package-search-index.js', 'packageSearchIndex = ')
 
     index = dict()
     for e in data:

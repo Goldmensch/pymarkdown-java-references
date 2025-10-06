@@ -1,6 +1,5 @@
 import requests
 
-
 def read_url(url: str) -> str:
     resp = requests.get(url)
     resp.raise_for_status()

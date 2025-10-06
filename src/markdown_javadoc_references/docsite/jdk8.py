@@ -20,7 +20,7 @@ def load(url: str) -> Docsite:
     klasses = dict()
 
     for anchor in soup.find('body').find('div').find('ul').select('a[href]'):
-        klass = load_class(url, anchor)
+        klass = _load_class(url, anchor)
 
         # append subclasses as individual classes
         for name in klass.name.split('.'):
@@ -30,7 +30,7 @@ def load(url: str) -> Docsite:
 
 
 # noinspection PyTypeChecker
-def load_class(url: str, c: Tag) -> Klass:
+def _load_class(url: str, c: Tag) -> Klass:
     logger.debug(f"Loading jdk8 class: {url}")
     name = c.get_text(strip=True)
     package = c.get('title').split()[-1]
@@ -41,7 +41,7 @@ def load_class(url: str, c: Tag) -> Klass:
     return klass
 
 
-def load_members(url: str, klass: Klass):
+def _load_members(url: str, klass: Klass):
     logger.debug(f"Loading members for: {klass}")
 
     text = read_url(url)
@@ -101,7 +101,7 @@ class Jdk8(Docsite):
         for klass in found:
             # none if unloaded
             if klass.methods is None:
-                load_members(klass.url, klass)
+                _load_members(klass.url, klass)
             loaded.append(klass)
 
         return loaded
