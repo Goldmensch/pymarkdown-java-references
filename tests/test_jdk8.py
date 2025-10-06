@@ -6,10 +6,33 @@ default_urls = [
     'https://docs.oracle.com/javase/8/docs/api/'
 ]
 
-def compare(expected, text, urls=default_urls):
-    result = markdown.markdown(text, extensions=[JavaDocRefExtension(urls=urls)])
+type_extract_format = """
+match ref:
+    case Klass():
+        return f'{ref.type}'
+"""
+
+def compare(expected, text, urls=default_urls, autolink_format=''):
+    result = markdown.markdown(text, extensions=[JavaDocRefExtension(urls=urls, **{'autolink-format': autolink_format})])
 
     assert result == expected
+
+def test_type_extraction_class():
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">Type.CLASS</a></p>'
+    compare(expected, "<java.lang.String>", autolink_format=type_extract_format)
+
+def test_type_extraction_interface():
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/javax/xml/ws/Response.html">Type.INTERFACE</a></p>'
+    compare(expected, "<javax.xml.ws.Response>", autolink_format=type_extract_format)
+
+def test_type_extraction_annotation():
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/annotation/Retention.html">Type.ANN_INTERFACE</a></p>'
+    compare(expected, "<java.lang.annotation.Retention>", autolink_format=type_extract_format)
+
+def test_type_extraction_enum():
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/annotation/RetentionPolicy.html">Type.ENUM</a></p>'
+    compare(expected, "<java.lang.annotation.RetentionPolicy>", autolink_format=type_extract_format)
+
 
 def test_only_class():
     expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></p>'

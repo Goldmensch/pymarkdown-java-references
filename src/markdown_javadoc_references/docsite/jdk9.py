@@ -1,8 +1,11 @@
 import json
 import urllib.parse
+from functools import lru_cache
+
+from bs4 import BeautifulSoup
 
 from .docsite import Docsite
-from .util import read_url
+from .util import read_url, find_class_type
 from ..entities import Klass, Method, Field
 from ..reference import Reference
 from ..util import get_logger
@@ -62,7 +65,7 @@ def _load_classes(url: str, pkgs: dict[str, dict[str, str]], members: dict[str, 
         fields = list()
 
         klass_url = _build_klass_url(url, module, package, name)
-        klass = Klass(module, package, name, methods, fields, klass_url)
+        klass = Klass(module, package, name, methods, fields, None, klass_url)
 
         i = f'{package}.{name}'
 
@@ -121,9 +124,21 @@ def _load_packages(url: str) -> dict[str, dict[str, str]]:
         index[e['l']] = e
     return index
 
-class Jdk9(Docsite):
-    def __init__(self, klasses: dict[str, list[Klass]]):
-        self.klasses = klasses
+def _load_type(klass: Klass):
+    text = read_url(klass.url)
+    soup = BeautifulSoup(text, "html.parser")
 
-    def klasses_for_ref(self, reference: Reference) -> list[Klass]:
-        return self.klasses[reference.class_name] if reference.class_name in self.klasses else list()
+    # find class type
+    title = soup.find("h1", attrs={"class": "title"})
+    klass.type = find_class_type(title.text, klass)
+
+class Jdk9(Docsite):
+    def _klasses_for_ref_uncached(self, class_name: str) -> list[Klass]:
+        if class_name not in self.klasses:
+            return []
+
+        found = self.klasses[class_name]
+        for klass in found:
+            if klass.type is None:
+                _load_type(klass)
+        return found

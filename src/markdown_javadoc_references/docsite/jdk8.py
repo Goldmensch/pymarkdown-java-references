@@ -1,11 +1,12 @@
 import urllib.parse
+from functools import lru_cache
 
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 
 from .docsite import Docsite
-from .util import read_url
-from ..entities import Klass, Method, Field
+from .util import read_url, find_class_type
+from ..entities import Klass, Method, Field, Type
 from ..reference import Reference
 from ..util import get_logger
 
@@ -35,16 +36,16 @@ def _load_class(url: str, c: Tag) -> Klass:
     name = c.get_text(strip=True)
     package = c.get('title').split()[-1]
 
-    klass = Klass(None, package, name, None, None, f'{url}/{c.get("href")}')
+    klass = Klass(None, package, name, None, None, None, f'{url}/{c.get("href")}')
     logger.debug(f'Loaded {package}.{name} from {klass.url}')
 
     return klass
 
 
-def _load_members(url: str, klass: Klass):
+def _load_members(klass: Klass):
     logger.debug(f"Loading members for: {klass}")
 
-    text = read_url(url)
+    text = read_url(klass.url)
     klass.methods = list()
     klass.fields = list()
 
@@ -52,7 +53,7 @@ def _load_members(url: str, klass: Klass):
     anchors = {a.get("name") for a in soup.find_all("a", attrs={"name": True})}
     for a in anchors:
         parts = a.split('-')
-        unquoted_url = urllib.parse.unquote(f'{url}#{a}')
+        unquoted_url = urllib.parse.unquote(f'{klass.url}#{a}')
         # first part is always name
         member_name = parts[0]
 
@@ -83,28 +84,31 @@ def _load_members(url: str, klass: Klass):
 
 
         klass.methods.append(Method(klass, member_name, new_params, unquoted_url))
+
     logger.debug(f"Found {len(klass.methods)} classes and {len(klass.fields)} fields for {klass.name} ({klass.url})")
 
-class Jdk8(Docsite):
-    def __init__(self, klasses):
-        self.klasses = klasses
+    # find class type
+    title = soup.find("h2", attrs={"class": "title"})
+    klass.type = find_class_type(title.text, klass)
 
-    # lazy load
-    def klasses_for_ref(self, reference: Reference) -> list[Klass]:
-        if reference.class_name not in self.klasses:
+class Jdk8(Docsite):
+    def _klasses_for_ref_uncached(self, class_name: str) -> list[Klass]:
+        if class_name not in self.klasses:
             return list()
-        found = self.klasses[reference.class_name]
+        found = self.klasses[class_name]
 
         found_names = list()
         for c in found:
             found_names.append(f" {c.name} -> {c.url}) ||")
-        logger.debug(f"Found classes: {found_names} for reference {reference}")
+        logger.debug(f"Found classes: {found_names} for reference {class_name}")
 
-        loaded = list()
         for klass in found:
             # none if unloaded
             if klass.methods is None:
-                _load_members(klass.url, klass)
-            loaded.append(klass)
+                _load_members(klass)
 
-        return loaded
+        return found
+
+
+
+

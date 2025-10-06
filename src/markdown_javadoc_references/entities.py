@@ -1,7 +1,20 @@
 import re
+from enum import Enum
+
 
 class Entity:
     pass
+
+class Type(Enum):
+    """
+    The type of a resolved class.
+    """
+
+    CLASS = 1
+    INTERFACE = 2
+    ANN_INTERFACE = 3
+    RECORD = 4
+    ENUM = 5
 
 class Klass(Entity):
     """
@@ -19,17 +32,20 @@ class Klass(Entity):
         The methods of this class
     fields : list[Field]
         The fields/enum constants of this class
+    type : Type
+        The type of this class
     url : str
         The url pointing to the javadoc site of this class
     """
 
-    def __init__(self, module: str | None, package: str, name: str, methods: list['Method'], fields: list['Field'], url: str):
+    def __init__(self, module: str | None, package: str, name: str, methods: list['Method'], fields: list['Field'], class_type: Type, url: str):
         self.module = module
         self.package = package
         self.name = name
         self.methods = methods
         self.url = url
         self.fields = fields
+        self.type = class_type
 
 class Field(Entity):
     """

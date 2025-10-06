@@ -125,7 +125,7 @@ class Resolver:
                 if alias != reference.javadoc_alias:
                     continue
 
-            klasses = site.klasses_for_ref(reference)
+            klasses = site.klasses_for_ref(reference.class_name)
             if klasses is None:
                 continue
             links |= _matches(klasses, reference)

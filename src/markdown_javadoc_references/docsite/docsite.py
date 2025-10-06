@@ -10,7 +10,15 @@ from ..util import get_logger
 logger = get_logger(__name__)
 
 class Docsite:
-    def klasses_for_ref(self, reference) -> list[Klass]:
+    def __init__(self, klasses):
+        self.klasses = klasses
+        self._klasses_for_ref_cached = lru_cache(maxsize=None)(self._klasses_for_ref_uncached)
+
+    def klasses_for_ref(self, class_name: str) -> list[Klass]:
+        return self._klasses_for_ref_cached(class_name)
+
+    # lazy load done here
+    def _klasses_for_ref_uncached(self, class_name: str) -> list[Klass]:
         pass
 
 @lru_cache(maxsize=None)

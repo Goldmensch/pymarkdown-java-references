@@ -23,6 +23,10 @@ def test_autolink_only_class_with_package():
     expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html">String</a></p>'
     compare(expected, "<java.lang.String>")
 
+def test_autolink_annotation():
+    expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/annotation/Retention.html">@Retention</a></p>'
+    compare(expected, "<java.lang.annotation.Retention>")
+
 def test_autolink_only_class_with_package_custom_formatter():
     autolink_format = """   
     match ref:

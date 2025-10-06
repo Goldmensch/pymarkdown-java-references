@@ -5,7 +5,7 @@ from typing import cast
 from ..reference import raw_pattern as ref_pattern
 from markdown.inlinepatterns import InlineProcessor
 
-from ..entities import Klass, Field, Method, Entity
+from ..entities import Klass, Field, Method, Entity, Type
 from ..resolver import Resolver
 from ..util import get_logger
 
@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 def _default_formatter(ref: Entity) -> str:
     match ref:
         case Klass():
-            return ref.name
+            return f"@{ref.name}" if ref.type == Type.ANN_INTERFACE else ref.name
         case Field():
             return f'{ref.klass.name}#{ref.name}'
         case Method():
@@ -27,7 +27,8 @@ def _compile_formatter(code: str) -> Callable[[Entity], str]:
         "Klass": Klass,
         "Method": Method,
         "Field": Field,
-        "Entity": Entity
+        "Entity": Entity,
+        "Type": Type
     }
 
     indented = '\n'.join("  " + line for line in code.splitlines())
