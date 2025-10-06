@@ -84,7 +84,18 @@ The names `Klass`, `Field` and `Method` are automatically imported for you. Plea
 to learn more about the data and utility functions of each entity.
 
 > [!NOTE]
-> The content of this config options will be copied in as the body of a python function. 
+> The content of this config option will be copied in as the body of a python function. 
+
+### Classes
+To just reference a class you only need to provide its name:
+`<String>`. If multiple classes with this name exists, just add a [package](#packages) or [url alias](#url-aliases).
+
+### Methods
+To reference methods you provide the classname and method name following its parameters separated by `#`:
+`<String#conact(String)`.
+
+Again, if multiple javadocs are matched just add a [url alias](#url-aliases) or [packages](#packages) to parameters
+or the enclosing class.
 
 ### Packages
 To clarify which class to use, you can add a package in front of it:
