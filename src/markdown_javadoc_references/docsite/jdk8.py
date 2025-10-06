@@ -90,23 +90,8 @@ def _load_members(klass: Klass):
     klass.type = find_class_type(title.text, klass)
 
 class Jdk8(Docsite):
-    def _klasses_for_ref_uncached(self, class_name: str) -> list[Klass]:
-        if class_name not in self.klasses:
-            return list()
-        found = self.klasses[class_name]
-
-        found_names = list()
-        for c in found:
-            found_names.append(f" {c.name} -> {c.url}) ||")
-        logger.debug(f"Found classes: {found_names} for reference {class_name}")
-
-        for klass in found:
-            # none if unloaded
-            if klass.methods is None:
-                _load_members(klass)
-
-        return found
-
+    def __init__(self, klasses):
+        super().__init__(klasses, _load_members)
 
 
 

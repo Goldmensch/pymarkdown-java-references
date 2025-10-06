@@ -133,12 +133,5 @@ def _load_type(klass: Klass):
     klass.type = find_class_type(title.text, klass)
 
 class Jdk9(Docsite):
-    def _klasses_for_ref_uncached(self, class_name: str) -> list[Klass]:
-        if class_name not in self.klasses:
-            return []
-
-        found = self.klasses[class_name]
-        for klass in found:
-            if klass.type is None:
-                _load_type(klass)
-        return found
+    def __init__(self, klasses):
+        super().__init__(klasses, _load_type)

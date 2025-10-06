@@ -1,3 +1,5 @@
+from concurrent.futures import ThreadPoolExecutor
+
 from .docsite import docsite
 from .reference import create_or_none
 from .reference import Type
@@ -8,7 +10,6 @@ import xml.etree.ElementTree as etree
 from .util import get_logger
 
 logger = get_logger(__name__)
-
 
 def _matches(klasses, reference):
     links = dict()
@@ -69,27 +70,28 @@ def _process_url(url):
     stripped_url = url.removesuffix('/')
     return docsite.load(stripped_url)
 
+executor = ThreadPoolExecutor(max_workers=8)
 
 class Resolver:
     def __init__(self, urls):
         self.sites = dict()
 
-        for entry in urls:
+        def process(entry):
             if isinstance(entry, str):
-                site = _process_url(entry)
-                if site is None:
-                    continue
-                self.sites[entry.strip()] = site
+                processed = _process_url(entry)
+                return entry.strip(), processed
             elif isinstance(entry, dict) and 'alias' in entry and 'url' in entry:
-                site = _process_url(entry['url'])
-                if site is None:
-                    continue
-                self.sites[entry['alias'].strip()] = site
+                processed = _process_url(entry['url'])
+                return entry['alias'].strip(), processed
             else:
                 raise TypeError(
                     f"Invalid entry in urls config: {entry!r}. "
                     f"Expected string or dict with 'alias' and 'url'."
                 )
+
+        for alias, site in executor.map(process, urls):
+            if site is not None:
+                self.sites[alias] = site
 
     def resolve(self, text: str, ref: str) -> tuple[Entity | None, etree.Element]:
         logger.debug(f"Resolving link with text {text} and reference {ref}")
@@ -119,14 +121,22 @@ class Resolver:
         return None, el
 
     def _find_matching_javadoc(self, reference) -> dict[str, Entity]:
-        links = dict()
-        for alias, site in self.sites.items():
-            if reference.javadoc_alias is not None:
-                if alias != reference.javadoc_alias:
-                    continue
+        links = {}
+
+        def process_site(item):
+            alias, site = item
+            if reference.javadoc_alias is not None and alias != reference.javadoc_alias:
+                return None
 
             klasses = site.klasses_for_ref(reference.class_name)
             if klasses is None:
-                continue
-            links |= _matches(klasses, reference)
+                return None
+            return _matches(klasses, reference)
+
+        futures = list(executor.map(process_site, self.sites.items()))
+
+        for result in futures:
+            if result:
+                links |= result
+
         return links
