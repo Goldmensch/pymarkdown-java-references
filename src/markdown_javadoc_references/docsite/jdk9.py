@@ -123,6 +123,8 @@ def _load_packages(url: str) -> dict[str, dict[str, str]]:
     return index
 
 def _load_type(klass: Klass):
+    logger.debug(f"Loading type for {klass.url}")
+
     text = read_url(klass.url)
     soup = BeautifulSoup(text, "html.parser")
 

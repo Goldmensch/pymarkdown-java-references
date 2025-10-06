@@ -30,5 +30,3 @@ def find_class_type(text: str, klass: Klass) -> Type | None:
         case _:
             logger.error(f"Unknown class type in title {text} of {klass.url}")
             return None
-
-    logger.debug(f"Set type {klass.type} for {klass.url}")
