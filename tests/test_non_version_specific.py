@@ -91,13 +91,21 @@ def test_javadoc_not_auto_searched_found():
     compare(expected, "<jdk8 -> String>", urls=urls)
 
 
-def test_site_not_found():
+def test_site_not_found_alias():
     urls = [
         'https://notworkingdocs.com',
     ]
 
     expected = '<p><a href="jdk8 -&gt; String">Invalid reference to jdk8 -&gt; String</a></p>'
     compare(expected, "<jdk8 -> String>", urls=urls)
+
+def test_site_not_found():
+    urls = [
+        'https://notworkingdocs.com',
+    ]
+
+    expected = '<p><a href="String">Invalid reference to String</a></p>'
+    compare(expected, "<String>", urls=urls)
 
 def test_multiple_in_text_link_with_codeblocks():
     text = """

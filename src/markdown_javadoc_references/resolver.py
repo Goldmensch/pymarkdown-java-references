@@ -78,6 +78,11 @@ class LoadedSite:
         self.auto_searched = auto_searched
         self.site = site
 
+def _create_site(site: Docsite | None, auto_searched: bool):
+    if site is None:
+        return None
+    return LoadedSite(site, auto_searched)
+
 class Resolver:
     def __init__(self, urls):
         self.sites = dict()
@@ -85,11 +90,11 @@ class Resolver:
         def process(entry):
             if isinstance(entry, str):
                 processed = _process_url(entry)
-                return entry.strip(), LoadedSite(processed, True)
+                return entry.strip(), _create_site(processed, True)
             elif isinstance(entry, dict) and 'alias' in entry and 'url' in entry:
                 processed = _process_url(entry['url'])
                 auto_searched = 'auto_searched' not in entry or entry['auto_searched'] == 'true'
-                return entry['alias'].strip(), LoadedSite(processed, auto_searched)
+                return entry['alias'].strip(), _create_site(processed, auto_searched)
             else:
                 raise TypeError(
                     f"Invalid entry in urls config: {entry!r}. "
