@@ -44,7 +44,7 @@ class Docsite:
         return found
 
 @lru_cache(maxsize=None)
-def load(url: str) -> Docsite | None:
+def load(url: str, type: str | None) -> Docsite | None:
     from .jdk8 import load as jdk8_load
     from .jdk9 import load as jdk9_load
 
@@ -59,5 +59,6 @@ def load(url: str) -> Docsite | None:
         return None
 
     # /allclasses-noframe.html only exists pre java 9
-    existing = check_url(f'{url}/allclasses-noframe.html')
-    return jdk8_load(url) if existing.ok else jdk9_load(url)
+    f_type = type if type is not None else ('old' if check_url(f'{url}/allclasses-noframe.html').ok else 'new')
+
+    return jdk8_load(url) if f_type == 'old' else jdk9_load(url)

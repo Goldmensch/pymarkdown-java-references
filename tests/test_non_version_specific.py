@@ -148,3 +148,25 @@ or something else like <StringBuilder>
 or something else like <a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/StringBuilder.html">StringBuilder</a></p>"""
 
     compare(expected, text)
+
+def test_type_new_specific():
+    urls = [
+        {
+            'type': 'new',
+            'url': 'https://docs.oracle.com/en/java/javase/24/docs/api/'
+        }
+    ]
+
+    expected = '<p><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html">String</a></p>'
+    compare(expected, "<String>", urls=urls)
+
+def test_type_old_specific():
+    urls = [
+        {
+            'type': 'old',
+            'url': 'https://docs.oracle.com/javase/8/docs/api/'
+        }
+    ]
+
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></p>'
+    compare(expected, "<String>", urls=urls)

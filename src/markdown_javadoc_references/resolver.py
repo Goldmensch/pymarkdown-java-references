@@ -65,11 +65,11 @@ def _matches(klasses, reference):
     return links
 
 
-def _process_url(url):
+def _process_url(url: str, type: str | None):
     logger.debug(f"Process url {url}")
 
     stripped_url = url.removesuffix('/')
-    return docsite.load(stripped_url)
+    return docsite.load(stripped_url, type)
 
 executor = ThreadPoolExecutor(max_workers=8)
 
@@ -89,12 +89,15 @@ class Resolver:
 
         def process(entry):
             if isinstance(entry, str):
-                processed = _process_url(entry)
+                processed = _process_url(entry, None)
                 return entry.strip(), _create_site(processed, True)
-            elif isinstance(entry, dict) and 'alias' in entry and 'url' in entry:
-                processed = _process_url(entry['url'])
+            elif isinstance(entry, dict)  and 'url' in entry:
+                type = entry['type'] if 'type' in entry else None
+                processed = _process_url(entry['url'], type)
+
                 auto_searched = 'auto_searched' not in entry or entry['auto_searched'] == 'true'
-                return entry['alias'].strip(), _create_site(processed, auto_searched)
+                alias = entry['alias'] if 'alias' in entry else entry['url']
+                return alias.strip(), _create_site(processed, auto_searched)
             else:
                 raise TypeError(
                     f"Invalid entry in urls config: {entry!r}. "

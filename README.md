@@ -169,3 +169,20 @@ markdown_extensions:
 ```
 
 Then you can just reference them with help of [aliases](#url-aliases): `<jdk8 -> String>`.
+
+### Explicitly setting type of javadoc site
+In most cases, the extension will find out if a docsite must be loaded as prior to Java 9 or as from Java 9 onwards.
+But in some cases (like when using <https://javadoc.io>) this isn't always possible. 
+
+In such cases you have to state the needed type of javadoc site explicitly:
+
+- 'old' for prior java 9 site (java 1 to 8)
+- 'new' for java 9 onwards (java 9, 10+)
+
+```yaml
+markdown_extensions:
+  - markdown_javadoc_references:
+      - urls:
+          - url: 'https://docs.oracle.com/javase/8/docs/api/'
+            type: 'old'
+```
