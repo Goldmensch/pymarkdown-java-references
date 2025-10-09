@@ -3,8 +3,9 @@ from functools import lru_cache
 from typing import Callable
 
 import requests.exceptions
+from bs4 import BeautifulSoup
 
-from .util import check_url
+from .util import check_url, read_url
 from ..entities import Klass
 from ..util import get_logger
 
@@ -44,13 +45,17 @@ class Docsite:
         return found
 
 @lru_cache(maxsize=None)
-def load(url: str, type: str | None) -> Docsite | None:
+def load(raw_url: str, type: str | None) -> Docsite | None:
     from .jdk8 import load as jdk8_load
     from .jdk9 import load as jdk9_load
 
+    url = _resolve_special(raw_url)
+    if url is None:
+        return None
+
     # check if url is reachable
     try:
-        resp = check_url(url)
+        resp = check_url(url + '/index.html')
         if not resp.ok:
             logger.error(f"Couldn't open site {url}, got {resp.status_code} - skipping it... Perhaps misspelled?")
             return None
@@ -62,3 +67,24 @@ def load(url: str, type: str | None) -> Docsite | None:
     f_type = type if type is not None else ('old' if check_url(f'{url}/allclasses-noframe.html').ok else 'new')
 
     return jdk8_load(url) if f_type == 'old' else jdk9_load(url)
+
+def _resolve_special(url: str) -> str | None:
+    if url.startswith('https://javadoc.io/doc'):
+        stripped =  url.removesuffix('index.html').removesuffix('/')
+        if stripped.endswith('latest'):
+            stripped = _resolve_javadocio_latest(stripped)
+            if stripped is None:
+                return None
+        return stripped.replace('/doc/', '/static/', 1)
+
+    return url
+
+def _resolve_javadocio_latest(stripped: str) -> str | None:
+    text = read_url(stripped)
+    soup = BeautifulSoup(text, "html.parser")
+    version_nav  = soup.findAll(attrs={'class': 'nav-link dropdown-toggle'})
+    if len(version_nav) != 2:
+        logger.error("Unknown javadoc.io version of latest link!")
+        return None
+    version = version_nav[1].text.strip()
+    return stripped.replace('/latest', f'/{version}')

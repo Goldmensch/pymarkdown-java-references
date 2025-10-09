@@ -186,3 +186,15 @@ markdown_extensions:
           - url: 'https://docs.oracle.com/javase/8/docs/api/'
             type: 'old'
 ```
+
+### Javadoc.io special handling
+Many projects host their javadocs on <https://javadoc.io>, which is a convenient way to find and host
+javadocs for multiple versions of a project.
+
+Unfortunately, the handling of subpages and the provided html code of this website is somehow different from normal javadoc. 
+Thus, this extension provides explicit support for:
+- latest versions, e.g. <https://javadoc.io/doc/com.zaxxer/HikariCP/latest/>
+- fixed versions, e.g. <https://javadoc.io/doc/com.zaxxer/HikariCP/7.0.1/>
+
+If the automatic mechanism shouldn't work one day, just put the static sites, e.g.
+<https://javadoc.io/static/com.zaxxer/HikariCP/7.0.1/> in your config.
