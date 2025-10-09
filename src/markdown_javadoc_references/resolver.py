@@ -1,6 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 
 from .docsite import docsite
+from .docsite.docsite import Docsite
 from .reference import create_or_none
 from .reference import Type
 from .entities import Entity
@@ -72,6 +73,11 @@ def _process_url(url):
 
 executor = ThreadPoolExecutor(max_workers=8)
 
+class LoadedSite:
+    def __init__(self, site: Docsite, auto_searched: bool):
+        self.auto_searched = auto_searched
+        self.site = site
+
 class Resolver:
     def __init__(self, urls):
         self.sites = dict()
@@ -79,10 +85,11 @@ class Resolver:
         def process(entry):
             if isinstance(entry, str):
                 processed = _process_url(entry)
-                return entry.strip(), processed
+                return entry.strip(), LoadedSite(processed, True)
             elif isinstance(entry, dict) and 'alias' in entry and 'url' in entry:
                 processed = _process_url(entry['url'])
-                return entry['alias'].strip(), processed
+                auto_searched = 'auto_searched' not in entry or entry['auto_searched'] == 'true'
+                return entry['alias'].strip(), LoadedSite(processed, auto_searched)
             else:
                 raise TypeError(
                     f"Invalid entry in urls config: {entry!r}. "
@@ -123,15 +130,24 @@ class Resolver:
     def _find_matching_javadoc(self, reference) -> dict[str, Entity]:
         links = {}
 
-        def process_site(item):
-            alias, site = item
-            if reference.javadoc_alias is not None and alias != reference.javadoc_alias:
-                return None
-
+        def load(site):
             klasses = site.klasses_for_ref(reference.class_name)
             if klasses is None:
-                return None
+                return dict()
             return _matches(klasses, reference)
+
+        if reference.javadoc_alias is not None:
+            if reference.javadoc_alias not in self.sites:
+                logger.warning(f"URL alias {reference.javadoc_alias} is not defined in the config!")
+                return dict()
+            return load(self.sites[reference.javadoc_alias].site)
+
+        def process_site(item):
+            alias, meta = item
+            if not meta.auto_searched:
+                return None
+            return load(meta.site)
+
 
         futures = list(executor.map(process_site, self.sites.items()))
 

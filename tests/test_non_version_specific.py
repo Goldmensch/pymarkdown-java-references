@@ -66,6 +66,30 @@ def test_javadoc_alias_custom_alias():
     expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></p>'
     compare(expected, "<jdk8 -> String>", urls=urls)
 
+def test_javadoc_not_auto_searched_not_found():
+    urls = [
+        {
+            'alias': 'jdk8',
+            'url': 'https://docs.oracle.com/javase/8/docs/api/',
+            'auto_searched': 'false'
+        }
+    ]
+
+    expected = '<p><a href="String">Invalid reference to String</a></p>'
+    compare(expected, "<String>", urls=urls)
+
+def test_javadoc_not_auto_searched_found():
+    urls = [
+        {
+            'alias': 'jdk8',
+            'url': 'https://docs.oracle.com/javase/8/docs/api/',
+            'auto_searched': 'false'
+        }
+    ]
+
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></p>'
+    compare(expected, "<jdk8 -> String>", urls=urls)
+
 
 def test_site_not_found():
     urls = [

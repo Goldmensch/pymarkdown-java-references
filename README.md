@@ -151,3 +151,21 @@ Additionally, if you don't have an alias configured explicitly, you can still us
 
 > [!IMPORTANT]
 > The URL has to be still mentioned in the configuration!
+> 
+
+
+### Sites not automatically searched
+In certain cases, it is only necessary to reference classes from a documentation page a few times.
+However, adding these pages normally would lead to a whole series of conflicts.
+Therefore, you can set the `auto_searched` option to `false` for such classes. (You must give them an `alias`!)
+
+```yaml
+markdown_extensions:
+  - markdown_javadoc_references:
+      - urls:
+        - alias: 'jdk8'
+          url: 'https://docs.oracle.com/javase/8/docs/api/'
+          auto_searched: 'false'
+```
+
+Then you can just reference them with help of [aliases](#url-aliases): `<jdk8 -> String>`.
