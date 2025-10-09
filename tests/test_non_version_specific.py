@@ -66,6 +66,17 @@ def test_javadoc_alias_custom_alias():
     expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></p>'
     compare(expected, "<jdk8 -> String>", urls=urls)
 
+def test_javadoc_alias_custom_alias_two_in_one_line():
+    urls = [
+        {
+            'alias': 'jdk8',
+            'url': 'https://docs.oracle.com/javase/8/docs/api/'
+        }
+    ]
+
+    expected = '<p><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a> Hu hu my test <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></p>'
+    compare(expected, "<String> Hu hu my test <jdk8 -> String>", urls=urls)
+
 def test_javadoc_not_auto_searched_not_found():
     urls = [
         {

@@ -133,8 +133,6 @@ class Resolver:
         return None, el
 
     def _find_matching_javadoc(self, reference) -> dict[str, Entity]:
-        links = {}
-
         def load(site):
             klasses = site.klasses_for_ref(reference.class_name)
             if klasses is None:
@@ -156,6 +154,7 @@ class Resolver:
 
         futures = list(executor.map(process_site, self.sites.items()))
 
+        links = {}
         for result in futures:
             if result:
                 links |= result
