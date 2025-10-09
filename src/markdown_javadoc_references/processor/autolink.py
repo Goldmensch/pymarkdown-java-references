@@ -38,7 +38,7 @@ def _compile_formatter(code: str) -> Callable[[Entity], str]:
     exec(wrapper, namespace)
     return cast(Callable[[Entity], str], namespace["autolink_format"])
 
-auto_link_pattern: str = rf'<(?!init>)({ref_pattern[:-1]})>'
+auto_link_pattern: str = rf'<(?!init>)({ref_pattern})>'
 
 class AutoLinkJavaDocProcessor(InlineProcessor):
     def __init__(self, md, resolver: Resolver, autolink_format: str):

@@ -9,7 +9,7 @@ from ..util import get_logger
 
 logger = get_logger(__name__)
 
-java_doc_pattern = rf'\[(.*)\]\[\[({ref_pattern[:-1]})\]\]'
+java_doc_pattern = rf'\[(.*)\]\[\[({ref_pattern})\]\]'
 class JavaDocProcessor(InlineProcessor):
     def __init__(self, md: Markdown, resolver: Resolver):
         super().__init__(java_doc_pattern, md)
