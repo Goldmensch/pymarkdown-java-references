@@ -74,3 +74,34 @@ def test_site_not_found():
 
     expected = '<p><a href="jdk8 -&gt; String">Invalid reference to jdk8 -&gt; String</a></p>'
     compare(expected, "<jdk8 -> String>", urls=urls)
+
+def test_multiple_in_text_link_with_codeblocks():
+    text = """
+You can use [`Strings`][[String]]
+or something else like [`StringBuilders`][[StringBuilder]]"""
+
+    expected = """<p>You can use <a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html"><code>Strings</code></a>
+or something else like <a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/StringBuilder.html"><code>StringBuilders</code></a></p>"""
+
+    compare(expected, text)
+
+def test_multiple_in_text_link():
+    text = """
+You can use [Strings][[String]]
+or something else like [StringBuilders][[StringBuilder]]"""
+
+    expected = """<p>You can use <a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html">Strings</a>
+or something else like <a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/StringBuilder.html">StringBuilders</a></p>"""
+
+    compare(expected, text)
+
+def test_multiple_in_text_autolink():
+    text = """
+You can use <String>
+or something else like <StringBuilder>
+"""
+
+    expected = """<p>You can use <a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/String.html">String</a>
+or something else like <a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/StringBuilder.html">StringBuilder</a></p>"""
+
+    compare(expected, text)
