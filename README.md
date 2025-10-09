@@ -172,7 +172,7 @@ Then you can just reference them with help of [aliases](#url-aliases): `<jdk8 ->
 
 ### Explicitly setting type of javadoc site
 In most cases, the extension will find out if a docsite must be loaded as prior to Java 9 or as from Java 9 onwards.
-But in some cases (like when using <https://javadoc.io>) this isn't always possible. 
+But in some cases this isn't always possible. 
 
 In such cases you have to state the needed type of javadoc site explicitly:
 

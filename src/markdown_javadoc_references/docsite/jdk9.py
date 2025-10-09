@@ -129,7 +129,7 @@ def _load_type(klass: Klass):
     soup = BeautifulSoup(text, "html.parser")
 
     # find class type
-    title = soup.find("h1", attrs={"class": "title"})
+    title = soup.find(None, attrs={"class": "title"})
     klass.type = find_class_type(title.text, klass)
 
 class Jdk9(Docsite):
